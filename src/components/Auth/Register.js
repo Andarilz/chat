@@ -1,18 +1,85 @@
 import React, {Component} from 'react'
 import {Grid, Form, Segment, Button, Header, Message, Icon} from 'semantic-ui-react'
 import {Link} from 'react-router-dom'
+import firebase from '../Firebase'
 
 export default class Register extends Component{
 
     state = {
-
+        username: '',
+        email: '',
+        password: '',
+        passwordConfirmation: '',
+        errors: []
     }
 
-    handleChange = () => {
-
+    handleClick = event => {
+        this.setState({
+            [event.target.name]: event.target.value
+        })
     }
+
+    isFormValid = () => {
+
+        let errors = []
+
+        let error
+
+        if(this.isFormEmpty(this.state)){ //проверка на пустоту
+            error = {message: 'Fill in all fields'}
+
+            this.setState({errors: errors.concat(error)}) //если форма пустая, пишем об этом
+
+            return false
+
+        } else if (!this.isPasswordValid(this.state)){
+            error = {message: 'Password is invalid'}
+
+            this.setState({
+                errors: errors.concat(error)
+            })
+
+            return false
+
+        } else {
+            return true
+        }
+    }
+
+    displayErrors = errors => errors.map((error, i )=> <p key={i}>{error.message}</p>)
+
+    isFormEmpty = ({username, password, email, passwordConfirmation}) => {
+        return !username.length || !password.length || !email.length || !passwordConfirmation.length
+    }
+
+    isPasswordValid = ({password, passwordConfirmation}) => {
+        if(password.length < 6 || passwordConfirmation.length < 6){
+            return false
+        } else if(password !== passwordConfirmation){
+            return false
+        } else {
+           return true
+        }
+    }
+
+    handleSubmit = event => {
+        if(this.isFormValid()){
+            event.preventDefault()
+            firebase
+                .auth()
+                .createUserWithEmailAndPassword(this.state.email, this.state.password)
+                .then(user => {
+                    console.log(user)
+                })
+                .catch(e => console.error(e))
+        }
+    }
+
 
     render(){
+
+        const {username, password, email, passwordConfirmation, errors} = this.state
+
         return(
             <Grid
                 textAlign='center'
@@ -30,51 +97,63 @@ export default class Register extends Component{
                             color='purple' />
                         Register for DevChat
                     </Header>
-                    <Form size='large' >
+                    <Form onSubmit={this.handleSubmit} size='large' >
                         <Segment stacked>
 
                         <Form.Input
                             fluid
-                            name='username'
                             icon='user'
                             iconPosition='left'
                             placeholder='Username'
-                            onChange={this.handleChange}
                             type='text'
+                            name='username'
+                            onChange={this.handleClick}
+                            value={username}
                         />
 
                         <Form.Input
                             fluid
-                            name='email'
                             icon='mail'
                             iconPosition='left'
                             placeholder='Email address'
-                            onChange={this.handleChange}
                             type='email'
+                            name='email'
+                            onChange={this.handleClick}
+                            value={email}
                         />
 
                         <Form.Input
                             fluid
-                            name='password'
                             icon='lock'
                             iconPosition='left'
                             placeholder='Password'
-                            onChange={this.handleChange}
                             type='password'
+                            name='password'
+                            onChange={this.handleClick}
+                            value={password}
                         />
 
                         <Form.Input
                             fluid
-                            name='passwordConfirmation'
                             icon='repeat'
                             iconPosition='left'
                             placeholder='Password Confirmation'
-                            onChange={this.handleChange}
                             type='password'
+                            name='passwordConfirmation'
+                            onChange={this.handleClick}
+                            value={passwordConfirmation}
                         />
                             <Button color='purple' fluid size='large'>Submit</Button>
                         </Segment>
                     </Form>
+
+                    {errors.length > 0 && (
+                        <Message error>
+                            <h3>Error</h3>
+                            {this.displayErrors(errors)}
+                        </Message>
+                    )}
+
                     <Message>Already a user? <Link to='/login'> Login</Link></Message>
 
                 </Grid.Column>
@@ -82,3 +161,20 @@ export default class Register extends Component{
         )
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
