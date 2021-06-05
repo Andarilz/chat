@@ -1,30 +1,52 @@
 import React, {Component} from 'react'
-import { Grid, Header, Dropdown, Icon } from "semantic-ui-react";
+import { Grid, Header, Dropdown, Icon, Image } from "semantic-ui-react";
+import firebase from "../../Firebase/Firebase";
 
-export default class UserPanel extends Component{
 
-    dropdownOptions = () => [
+class UserPanel extends Component{
+
+     state = {
+         user: ''
+     }
+
+     componentDidMount() {
+         this.setState({user: this.props.currentUser})
+     }
+
+     dropdownOptions = () => [
         {
             key: 'user',
-            text: <span>Signed in as <strong>User</strong></span>,
+            text: (<span>Signed in as <strong>{this.state.user.displayName}</strong></span>),
             disabled: true
         },
         {
             key: 'avatar',
-            text: <span>Change avatar</span>
+            text: (<span>Change avatar</span>)
         },
         {
-            key: 'signout',
-            text: <span>Sign Out</span>
+            key: 'signOut',
+            text: (<span onClick={this.handleSignOut}>Sign Out</span>)
         }
     ]
 
+    handleSignOut = () => {
+        firebase
+            .auth()
+            .signOut()
+            .then(() => console.log('done!'))
+    }
+
 
     render(){
+
+         const {user} = this.state
+
         return(
             <Grid style={{
                 background: '#4c3c4c'
             }}>
+
+
                 <Grid.Column>
                     <Grid.Row style={{
                         padding: '1.2em',
@@ -40,7 +62,6 @@ export default class UserPanel extends Component{
 
                     </Grid.Row>
 
-
                     {/*User DropDown*/}
 
                     <Header as='h4' inverted style={{
@@ -48,7 +69,10 @@ export default class UserPanel extends Component{
                     }}
                     >
                         <Dropdown trigger={
-                            <strong>User</strong>
+                            <span>
+                                <Image src={user.photoURL} spaced='right' avatar />
+                                {user.displayName}
+                            </span>
                         } options={this.dropdownOptions()}>
 
                         </Dropdown>
@@ -58,4 +82,8 @@ export default class UserPanel extends Component{
         )
     }
 }
+
+
+
+export default UserPanel
 

@@ -1,17 +1,19 @@
-import React from 'react'
+import React, {createContext} from 'react'
 import './App.css'
 import { Grid } from "semantic-ui-react";
 import ColorPenal from "./ColorPental/ColorPental";
 import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
 import MetaPenal from "./MetaPenal/MetaPenal";
+import {connect} from "react-redux";
 
-const App = (props) => (
+
+const App = ({currentUser}) => (
     <Grid columns='equal' className='app' style={{
         background: '#eee'
     }}>
         <ColorPenal />
-        <SidePanel />
+        <SidePanel currentUser={currentUser} />
 
         <Grid.Column style={{marginLeft: 320}}>
             <Messages />
@@ -23,4 +25,8 @@ const App = (props) => (
     </Grid>
 )
 
-export default App
+const mapStateToProps = state => ({
+    currentUser: state.user.currentUser
+})
+
+export default connect(mapStateToProps)(App)

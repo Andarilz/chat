@@ -4,6 +4,10 @@ import UserPanel from "../UserPanel/UserPanel";
 
 class SidePanel extends Component{
     render(){
+
+        const {currentUser} = this.props
+
+
         return(
             <Menu
             size='large'
@@ -15,7 +19,8 @@ class SidePanel extends Component{
                 fontSize: '1.2rem'
             }}
             >
-                <UserPanel />
+                <UserPanel currentUser={currentUser} />
+
             </Menu>
         )
     }
