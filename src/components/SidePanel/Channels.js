@@ -1,16 +1,89 @@
 import React, {Fragment, Component} from 'react'
 import {Menu, Icon, Modal, Form, Input, Button} from 'semantic-ui-react'
+import firebase from "../../Firebase/Firebase";
+import axios from "axios";
 
 
 class Channels extends Component{
 
     state = {
+        user: this.props.currentUser,
         channels: [],
         modal: false,
         channelName: '',
-        channelDetails: ''
+        channelDetails: '',
+        channelsRef: firebase.database().ref('channels')
     }
 
+    componentDidMount() {
+        this.addListeners()
+    }
+
+    addListeners = async () => {
+        let loadChannels = []
+        await axios.get('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json')
+            .then(inf => {
+                console.log(inf.data, '1')
+                return inf.data
+            })
+            .then(data => {
+
+                // data - объект с объектами
+
+               const keys = Object.keys(data) //массив ключей
+
+                const channels = keys.map(key => {
+                    return data[key]
+               })
+
+                this.setState( {channels} )
+
+                console.log(channels, 'Channels')
+
+            })
+    }
+
+    addChannel = async () => {
+        const {channelDetails, channelName, user, channelsRef} = this.state
+
+        const key = channelsRef.push().key
+
+        console.log('key', key)
+
+        await axios.post('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json', {
+            id: key,
+            name: channelName,
+            details: channelDetails,
+            createdBy: {
+                name: user.displayName,
+                avatar: user.photoURL
+            }
+        })
+            .then(() => {
+                this.setState({channelName: '', channelDetails: ''})
+                this.closeModal()
+                console.log('channels added')
+            })
+            .catch(e => {
+                console.err(e)
+            })
+
+    }
+
+    displayChannels = channels => (
+        channels.length > 0 && channels.map(channel => (
+            <Menu.Item
+            key={channel.id}
+            onClick={() => console.log(channel)}
+            name={channel.name}
+            style={{
+                opacity: 0.7
+            }}
+            >
+                #{channel.name}
+            </Menu.Item>
+        ))
+    )
     openModal  = () => this.setState({modal: true})
 
     closeModal = () => this.setState({modal: false})
@@ -18,6 +91,16 @@ class Channels extends Component{
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value})
     }
+
+    handleSubmit = event => {
+        event.preventDefault()
+        if(this.isFormValid(this.state)){
+            console.log('Channel added')
+            this.addChannel()
+        }
+    }
+
+    isFormValid = ({ channelName, channelDetails  }) => channelName && channelDetails
 
     render(){
 
@@ -34,7 +117,9 @@ class Channels extends Component{
                     </span> {' '}
                     ({ channels.length }) <Icon name='add' onClick={this.openModal} style={{cursor: 'pointer'}} />
                 </Menu.Item>
-                {/*Channels*/}
+
+                {this.displayChannels(channels)}
+
             </Menu.Menu>
 
             {/*// Add channel model*/}
@@ -44,7 +129,7 @@ class Channels extends Component{
             <Modal.Header>Add a Channel</Modal.Header>
             <Modal.Content>
 
-                <Form>
+                <Form onSubmit={this.handleSubmit}>
 
                     <Form.Field>
                         <Input
@@ -70,7 +155,7 @@ class Channels extends Component{
             </Modal.Content>
 
             <Modal.Actions>
-                <Button color='green' inverted>
+                <Button color='green' inverted onClick={this.handleSubmit}>
                     <Icon name='checkmark' /> Add
                 </Button>
 
