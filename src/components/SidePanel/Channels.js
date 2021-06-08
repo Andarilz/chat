@@ -14,7 +14,9 @@ class Channels extends Component{
         modal: false,
         channelName: '',
         channelDetails: '',
-        channelsRef: firebase.database().ref('channels')
+        channelsRef: firebase.database().ref('channels').child,
+        firstLoad: true,
+        activeChannel: ''
     }
 
     componentDidMount() {
@@ -22,10 +24,8 @@ class Channels extends Component{
     }
 
     addListeners = async () => {
-        let loadChannels = []
         await axios.get('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json')
             .then(inf => {
-                console.log(inf.data, '1')
                 return inf.data
             })
             .then(data => {
@@ -38,11 +38,22 @@ class Channels extends Component{
                     return data[key]
                })
 
-                this.setState( {channels} )
+                this.setState( {channels}, () => this.setFirstChannel())
 
-                console.log(channels, 'Channels')
 
             })
+    }
+
+    setFirstChannel = () => {
+
+        const firstChannel = this.state.channels[0]
+
+        if(this.state.firstLoad && this.state.channels.length > 0){
+            this.props.setCurrentChannel(firstChannel)
+            this.setActiveChannel(firstChannel)
+        }
+        this.setState({firstLoad: false})
+
     }
 
     addChannel = async () => {
@@ -81,11 +92,13 @@ class Channels extends Component{
             style={{
                 opacity: 0.7
             }}
+            active={channel.id === this.state.activeChannel}
             >
                 #{channel.name}
             </Menu.Item>
         ))
     )
+
     openModal  = () => this.setState({modal: true})
 
     closeModal = () => this.setState({modal: false})
@@ -95,7 +108,12 @@ class Channels extends Component{
     }
 
     changeChannel = channel => {
+        this.setActiveChannel(channel)
         this.props.setCurrentChannel(channel)
+    }
+
+    setActiveChannel = channel => {
+        this.setState({ activeChannel: channel.id})
     }
 
     handleSubmit = event => {
