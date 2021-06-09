@@ -26,3 +26,11 @@ body,
     z-index: 200;
 
 }
+
+
+/*Message*/
+
+.message__self{
+    border-left: 2px solid orange;
+    padding-left: 8px;
+}
