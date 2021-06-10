@@ -6,7 +6,6 @@ import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
 import MetaPenal from "./MetaPenal/MetaPenal";
 import {connect} from "react-redux";
-import MessageForm from "./Messages/MessageForm";
 
 
 const App = ({ currentUser, currentChannel }) => (

@@ -4,6 +4,7 @@ import firebase from "../../Firebase/Firebase";
 import axios from "axios";
 import {setCurrentChannel} from "../../actions";
 import {connect} from "react-redux";
+import {v4} from 'uuid'
 
 
 class Channels extends Component{
@@ -57,11 +58,9 @@ class Channels extends Component{
     }
 
     addChannel = async () => {
-        const {channelDetails, channelName, user, channelsRef} = this.state
+        const {channelDetails, channelName, user} = this.state
 
-        const key = channelsRef.push().key
-
-        console.log('key', key)
+        const key = v4()
 
         await axios.post('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json', {
             id: key,
@@ -75,7 +74,7 @@ class Channels extends Component{
             .then(() => {
                 this.setState({channelName: '', channelDetails: ''})
                 this.closeModal()
-                console.log('channels added')
+                this.addListeners()
             })
             .catch(e => {
                 console.err(e)

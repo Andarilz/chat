@@ -1,7 +1,11 @@
-import React, {Component} from 'react'
+import React, {Component, createContext} from 'react'
 import {Segment, Button, Input} from 'semantic-ui-react'
 import firebase from '../../Firebase/Firebase'
 import axios from 'axios'
+import Messages from "./Messages";
+import ColorPenal from "../ColorPental/ColorPental";
+
+export const LoadingContext = createContext(false)
 
 
 class MessageForm extends Component{
@@ -14,7 +18,10 @@ class MessageForm extends Component{
         errors: []
     }
 
-    handleChange = event => this.setState({[event.target.name]: event.target.value})
+
+    handleChange = event => {
+        this.setState({[event.target.name]: event.target.value})
+    }
 
     sendMessage = async () => {
 
@@ -24,6 +31,7 @@ class MessageForm extends Component{
             //send message
 
             this.setState({loading: true})
+            this.props.updateData()
 
                 await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`,{
                         timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -36,11 +44,12 @@ class MessageForm extends Component{
                         content: this.state.message
                 })
                 .then(() => {
-                    this.setState({loading: false, errors: [], message: ''})
+                    this.setState({loading: false, errors: [], message: '', rerenderComp: false})
+                    this.props.updateData()
                 })
                 .catch(e => {
                     console.error(e)
-                    this.setState({errors: this.state.errors.concat(e), loading: false})
+                    this.setState({errors: this.state.errors.concat(e), loading: false, rerenderComp: false})
                 })
         } else {
             this.setState({
@@ -51,10 +60,17 @@ class MessageForm extends Component{
 
 
     render(){
+
         const {errors, message, loading} = this.state
 
         return(
+
+            <React.Fragment>
+
+
+
             <Segment className='message__form'>
+
                 <Input
                     value={message}
                     onChange={this.handleChange}
@@ -93,6 +109,8 @@ class MessageForm extends Component{
                 </Button.Group>
 
             </Segment>
+
+            </React.Fragment>
         )
     }
 }

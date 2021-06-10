@@ -6,14 +6,15 @@ import firebase from "../../Firebase/Firebase";
 import axios from 'axios'
 import Message from "./Message";
 
-
 class Messages extends Component{
+
     state = {
         messagesRef: firebase.database().ref('messages'),
         channel: this.props.currentChannel,
         user: this.props.currentUser,
         messages: [],
-        messagesLoading: true
+        messagesLoading: true,
+        shouldLoading: false
     }
 
     componentDidMount() {
@@ -26,6 +27,15 @@ class Messages extends Component{
 
     }
 
+    updateData = () => {
+        const {user, channel} = this.state
+
+        if(channel && user){
+            this.addListeners(channel.id)
+        }
+    }
+
+
     addListeners = channelId => {
         this.addMessageListeners(channelId)
     }
@@ -34,12 +44,19 @@ class Messages extends Component{
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`)
             .then(res => {
                 const results = res.data
-                const keysOfMessages = Object.keys(results)
-                const mess = keysOfMessages.map(res => results[res])
-                this.setState({
-                    messages: mess,
-                    messagesLoading: false
-                })
+                if(results){
+                    const keysOfMessages = Object.keys(results)
+                    const mess = keysOfMessages.map(res => results[res])
+                    this.setState({
+                        messages: mess,
+                        messagesLoading: false
+                    })
+                }else{
+                    this.setState({
+                        messages: '',
+                        messagesLoading: false
+                    })
+                }
 
                 console.log(this.state.messages)
             })
@@ -57,14 +74,16 @@ class Messages extends Component{
     }
 
 
-
-
     render(){
 
         const {messagesRef, channel, user, messages} = this.state
 
         return(
             <React.Fragment>
+
+
+
+
                 <MessagesHeader />
 
 
@@ -78,6 +97,7 @@ class Messages extends Component{
                     messagesRef={messagesRef}
                     currentChannel={channel}
                     currentUser={user}
+                    updateData={this.updateData}
                 />
 
             </React.Fragment>
