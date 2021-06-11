@@ -18,16 +18,13 @@ class Messages extends Component{
     }
 
     componentDidMount() {
-
         const {user, channel} = this.state
-
         if(channel && user){
             this.addListeners(channel.id)
         }
-
     }
 
-    updateData = () => {
+    updateData = () => { //обновление списка сообщений
         const {user, channel} = this.state
 
         if(channel && user){
@@ -43,7 +40,7 @@ class Messages extends Component{
     addMessageListeners = async channelId => {
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`)
             .then(res => {
-                const results = res.data
+                const results = res.data || []
                 if(results){
                     const keysOfMessages = Object.keys(results)
                     const mess = keysOfMessages.map(res => results[res])
@@ -57,8 +54,6 @@ class Messages extends Component{
                         messagesLoading: false
                     })
                 }
-
-                console.log(this.state.messages)
             })
     }
 
@@ -81,11 +76,7 @@ class Messages extends Component{
         return(
             <React.Fragment>
 
-
-
-
                 <MessagesHeader />
-
 
                 <Segment>
                     <Comment.Group className='messages'>

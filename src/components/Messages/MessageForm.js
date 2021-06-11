@@ -1,11 +1,8 @@
-import React, {Component, createContext} from 'react'
+import React, {Component} from 'react'
 import {Segment, Button, Input} from 'semantic-ui-react'
 import firebase from '../../Firebase/Firebase'
 import axios from 'axios'
-import Messages from "./Messages";
-import ColorPenal from "../ColorPental/ColorPental";
-
-export const LoadingContext = createContext(false)
+import FileModal from './FileModal'
 
 
 class MessageForm extends Component{
@@ -15,23 +12,33 @@ class MessageForm extends Component{
         loading: false,
         channel: this.props.currentChannel,
         user: this.props.currentUser,
-        errors: []
+        errors: [],
+        modal: false
     }
 
+    openModal  = () => this.setState({modal: true})
+
+    closeModal = () => this.setState({modal: false})
 
     handleChange = event => {
         this.setState({[event.target.name]: event.target.value})
+    }
+
+    enterClick = event => {
+        if(event.keyCode == 13 && this.state.message){
+            this.sendMessage()
+        }
     }
 
     sendMessage = async () => {
 
         const {message, channel} = this.state
 
-        if(message){
+        if(message.trim().length){ // проверяем на пробелы
             //send message
 
             this.setState({loading: true})
-            this.props.updateData()
+            this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
                 await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`,{
                         timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -61,7 +68,7 @@ class MessageForm extends Component{
 
     render(){
 
-        const {errors, message, loading} = this.state
+        const {errors, message, loading, modal, closeModal} = this.state
 
         return(
 
@@ -74,6 +81,7 @@ class MessageForm extends Component{
                 <Input
                     value={message}
                     onChange={this.handleChange}
+                    onKeyDown={this.enterClick}
                     fluid
                     name='message'
                     style={{
@@ -98,12 +106,16 @@ class MessageForm extends Component{
                     />
 
                     <Button
-                    color='teal'
-                    content='Upload Media'
-                    labelPosition='right'
-                    icon='cloud upload'
+                        color='teal'
+                        content='Upload Media'
+                        labelPosition='right'
+                        icon='cloud upload'
+                        onClick={this.openModal} //по клику запускается изменение стейта на открытие
+                    />
 
-
+                    <FileModal
+                        modal={modal} //отслеживание открытия и закрытия модального окна
+                        closeModal={this.closeModal} //при закрытии меняется стейт на закрытие
                     />
 
                 </Button.Group>

@@ -27,7 +27,7 @@ class Channels extends Component{
     addListeners = async () => {
         await axios.get('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json')
             .then(inf => {
-                return inf.data
+                return inf.data || []
             })
             .then(data => {
 
