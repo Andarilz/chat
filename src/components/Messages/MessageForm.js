@@ -65,6 +65,9 @@ class MessageForm extends Component{
         }
     }
 
+    uploadFile = (file, metadata) => {
+        console.log(file, metadata)
+    }
 
     render(){
 
@@ -116,6 +119,7 @@ class MessageForm extends Component{
                     <FileModal
                         modal={modal} //отслеживание открытия и закрытия модального окна
                         closeModal={this.closeModal} //при закрытии меняется стейт на закрытие
+                        uploadFile = {this.uploadFile}
                     />
 
                 </Button.Group>

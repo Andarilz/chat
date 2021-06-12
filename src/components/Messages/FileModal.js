@@ -1,8 +1,42 @@
 import React, {Component} from 'react'
 import {Modal, Input, Button, Icon} from 'semantic-ui-react'
+import mime from 'mime-types'
 
 
 class FileModal extends Component{
+
+    state = {
+        file: null,
+        authorized: ['img/jpeg', 'image/png'] //допустимые типы файлов
+    }
+
+    addFile = event => {
+        const file = event.target.files[0]
+
+        if(file){
+            this.setState({file})
+        }
+    }
+
+    sendFile = () => {
+        const {file} = this.state
+
+        const {uploadFile, closeModal} = this.props
+
+        if(file !== null){
+            if(this.isAuthorized(file.name)){
+                const metadata = { contentType: mime.lookup(file.name) }
+                uploadFile(file, metadata)
+                closeModal()
+                this.clearFile()
+            }
+        }
+    }
+
+    isAuthorized = filename => this.state.authorized.includes(mime.lookup(filename)) //проверяем типы файлов
+
+    clearFile = () => this.setState({file: null})
+
     render(){
         const {modal, closeModal} = this.props
 
@@ -20,31 +54,16 @@ class FileModal extends Component{
                 label='file types .jpg, .png'
                 name='file'
                 type='file'
+                onChange={this.addFile}
                 />
 
             </Modal.Content>
 
             <Modal.Actions>
 
+                <Button onClick={this.sendFile} color='green' inverted><Icon name='checkmark'/> Send</Button>
 
-                <Button
-                color='green'
-                inverted
-                >
-                    <Icon
-                    name='checkmark'
-                    /> Send
-                </Button>
-
-                <Button
-                    color='red'
-                    inverted
-                    onClick={closeModal}
-                >
-                    <Icon
-                        name='remove'
-                    /> Cancel
-                </Button>
+                <Button color='red' inverted onClick={closeModal}><Icon name='remove'/> Cancel</Button>
 
             </Modal.Actions>
 
