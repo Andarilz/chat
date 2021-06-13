@@ -4,7 +4,6 @@ import firebase from "../../Firebase/Firebase";
 import axios from "axios";
 import {setCurrentChannel} from "../../actions";
 import {connect} from "react-redux";
-import {v4} from 'uuid'
 
 
 class Channels extends Component{
@@ -15,16 +14,16 @@ class Channels extends Component{
         modal: false,
         channelName: '',
         channelDetails: '',
-        channelsRef: firebase.database().ref('channels').child,
+        channelsRef: firebase.database().ref('channels'),
         firstLoad: true,
         activeChannel: ''
     }
 
     componentDidMount() {
-        this.addListeners()
+        this.addListeners() //при первой загрузке обновляем значения из БД
     }
 
-    addListeners = async () => {
+    addListeners = async () => { //запрашиваем данные по каналам из БД
         await axios.get('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json')
             .then(inf => {
                 return inf.data || []
@@ -35,17 +34,19 @@ class Channels extends Component{
 
                const keys = Object.keys(data) //массив ключей
 
-                const channels = keys.map(key => {
+                const channels = keys.map(key => { //перебираем массив для удобства
                     return data[key]
                })
 
                 this.setState( {channels}, () => this.setFirstChannel())
 
+                // this.setState( {channels}, () => this.setActiveChannel(this.state.channels[this.state.channels.length - 1]))
+
 
             })
     }
 
-    setFirstChannel = () => {
+    setFirstChannel = () => { //автопрокрутка на первый канал
 
         const firstChannel = this.state.channels[0]
 
@@ -57,10 +58,11 @@ class Channels extends Component{
 
     }
 
-    addChannel = async () => {
-        const {channelDetails, channelName, user} = this.state
+    addChannel = async () => { //запрос к БД с добавлением канала
+        const {channelDetails, channelName, user, channelsRef} = this.state
 
-        const key = v4()
+        // const key = v4()
+        const key = channelsRef.push().key
 
         await axios.post('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/channels.json', {
             id: key,
@@ -83,10 +85,10 @@ class Channels extends Component{
     }
 
     displayChannels = channels => (
-        channels.length > 0 && channels.map(channel => (
+        channels.length > 0 && channels.map(channel => ( //пробегаемся по массиву каналов для его вывода
             <Menu.Item
             key={channel.id}
-            onClick={() => this.changeChannel(channel)}
+            onClick={() => this.changeChannel(channel)} //вставляем значение канала и передаем его в функцию смены канала
             name={channel.name}
             style={{
                 opacity: 0.7
@@ -106,12 +108,12 @@ class Channels extends Component{
         this.setState({[event.target.name]: event.target.value})
     }
 
-    changeChannel = channel => {
+    changeChannel = channel => { // запускаем функцию установки активного канала с переданным значением канала
         this.setActiveChannel(channel)
         this.props.setCurrentChannel(channel)
     }
 
-    setActiveChannel = channel => {
+    setActiveChannel = channel => { //вставляем в стейт значение текущего канала, полученное после пробежки по всем значениям каналов, полученных из БЖ
         this.setState({ activeChannel: channel.id})
     }
 

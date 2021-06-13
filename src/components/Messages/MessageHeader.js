@@ -5,7 +5,7 @@ import { Header, Segment, Input, Icon } from 'semantic-ui-react'
 class MessagesHeader extends Component{
     render(){
         return(
-            <Segment clearing>
+            <Segment clearing className='CustomMessage'>
 
                 {/*Channel Title*/}
 

@@ -1,4 +1,4 @@
-import React, {createContext} from 'react'
+import React from 'react'
 import './App.css'
 import { Grid } from "semantic-ui-react";
 import ColorPenal from "./ColorPental/ColorPental";

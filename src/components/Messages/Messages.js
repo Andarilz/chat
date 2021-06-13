@@ -20,11 +20,11 @@ class Messages extends Component{
     componentDidMount() {
         const {user, channel} = this.state
         if(channel && user){
-            this.addListeners(channel.id)
+            this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
         }
     }
 
-    updateData = () => { //обновление списка сообщений
+    updateData = () => { //колл0бэк обновление списка сообщений, передается через пропсы
         const {user, channel} = this.state
 
         if(channel && user){
@@ -34,16 +34,17 @@ class Messages extends Component{
 
 
     addListeners = channelId => {
-        this.addMessageListeners(channelId)
+        this.addMessageListeners(channelId) //в дид маунте активируется
     }
 
-    addMessageListeners = async channelId => {
+    addMessageListeners = async channelId => { //делаем запрос к бд для получения данных
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`)
             .then(res => {
                 const results = res.data || []
+
                 if(results){
                     const keysOfMessages = Object.keys(results)
-                    const mess = keysOfMessages.map(res => results[res])
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства
                     this.setState({
                         messages: mess,
                         messagesLoading: false
@@ -67,7 +68,6 @@ class Messages extends Component{
             )
         )
     }
-
 
     render(){
 
