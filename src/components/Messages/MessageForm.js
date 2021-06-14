@@ -4,6 +4,7 @@ import firebase from '../../Firebase/Firebase'
 import axios from 'axios'
 import FileModal from './FileModal'
 import {v4} from 'uuid'
+import ProgressBar from "./ProgresBar";
 
 
 class MessageForm extends Component{
@@ -100,7 +101,8 @@ class MessageForm extends Component{
             () => {
                     this.state.uploadTask.on('state_changed', snap => { //ставим ограничение по размеру картинки
                     const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
-                    this.setState({percentUploaded})
+                        this.props.isProgressBarVisible(percentUploaded)
+                        this.setState({percentUploaded})
             }, err => {
                 console.error(err)
 
@@ -153,7 +155,10 @@ class MessageForm extends Component{
     }
 
     render(){
-        const {errors, message, loading, modal} = this.state
+        const {errors, message, loading, modal, uploadState, percentUploaded} = this.state
+
+        console.log('form', percentUploaded )
+
         return(
             <React.Fragment>
 
@@ -194,15 +199,20 @@ class MessageForm extends Component{
                         onClick={this.openModal} //по клику запускается изменение стейта на открытие
                     />
 
-                    <FileModal
-                        modal={modal} //отслеживание открытия и закрытия модального окна
-                        closeModal={this.closeModal} //при закрытии меняется стейт на закрытие
-                        uploadFile = {this.uploadFile} //событие загрузки
-                        linkImage={this.LinkImage}
-                        linkFinished={this.linkFinished}
-                    />
-
                 </Button.Group>
+
+                <FileModal
+                    modal={modal} //отслеживание открытия и закрытия модального окна
+                    closeModal={this.closeModal} //при закрытии меняется стейт на закрытие
+                    uploadFile = {this.uploadFile} //событие загрузки
+                    linkImage={this.LinkImage}
+                    linkFinished={this.linkFinished}
+                />
+
+                <ProgressBar
+                    uploadState={uploadState}
+                    percentUploaded={percentUploaded}
+                />
 
             </Segment>
 
