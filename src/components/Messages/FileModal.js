@@ -7,7 +7,8 @@ class FileModal extends Component{
 
     state = {
         file: null,
-        authorized: ['img/jpeg', 'image/png'] //допустимые типы файлов
+        authorized: ['img/jpeg', 'image/png'], //допустимые типы файлов
+        linkFile: null
     }
 
     addFile = event => {
@@ -19,7 +20,7 @@ class FileModal extends Component{
     }
 
     sendFile = () => {
-        const {file} = this.state
+        const {file, linkFile} = this.state
 
         const {uploadFile, closeModal} = this.props
 
@@ -30,12 +31,28 @@ class FileModal extends Component{
                 closeModal()
                 this.clearFile()
             }
+        } else if(linkFile !== null){
+                this.props.linkImage(linkFile)
+                this.props.linkFinished(true)
+                closeModal()
+                this.clearFile()
         }
     }
 
     isAuthorized = filename => this.state.authorized.includes(mime.lookup(filename)) //проверяем типы файлов
 
-    clearFile = () => this.setState({file: null})
+    clearFile = () => this.setState({file: null, linkFile: null})
+
+    addLinkFile = event => {
+        this.setState({
+            [event.target.name]: event.target.value
+        })
+    }
+
+    closeModalPanel = () => {
+        this.props.closeModal()
+        this.clearFile()
+    }
 
     render(){
         const {modal, closeModal} = this.props
@@ -55,6 +72,17 @@ class FileModal extends Component{
                 name='file'
                 type='file'
                 onChange={this.addFile}
+                disabled={!!this.state.linkFile}
+                />
+
+                <p>Or you can also</p>
+
+                <Input
+                type='text'
+                label='Paste link'
+                name='linkFile'
+                onChange={this.addLinkFile}
+                disabled={!!this.state.file}
                 />
 
             </Modal.Content>
@@ -63,7 +91,7 @@ class FileModal extends Component{
 
                 <Button onClick={this.sendFile} color='green' inverted><Icon name='checkmark'/> Send</Button>
 
-                <Button color='red' inverted onClick={closeModal}><Icon name='remove'/> Cancel</Button>
+                <Button color='red' inverted onClick={this.closeModalPanel}><Icon name='remove'/> Cancel</Button>
 
             </Modal.Actions>
 

@@ -18,7 +18,8 @@ class MessageForm extends Component{
         uploadState: '',
         uploadTask: null,
         storageRef: firebase.storage().ref(),
-        percentUploaded: 0
+        percentUploaded: 0,
+        link: true
     }
 
     openModal  = () => this.setState({modal: true}) //модальное окно
@@ -35,7 +36,7 @@ class MessageForm extends Component{
         }
     }
 
-    createMessage = (fileURL = null) => { //формируем объект для отправки на сервер
+    createMessage = (fileURL = null, linkImage= null) => { //формируем объект для отправки на сервер
         const message = {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             user: {
@@ -46,27 +47,34 @@ class MessageForm extends Component{
             },
         }
 
-        if(fileURL !== null){
+        if(linkImage !== null){ //создаем поле image со ссылкой, если она есть
+            message['image'] = linkImage
+
+        }
+
+        else if(fileURL !== null){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
             message['image'] = fileURL
-        } else {
-            message['content'] = this.state.message
+        }
+        else if(!linkImage && !fileURL) {
+            message['content'] = this.state.message // создаем поле content для отображения текста
         }
 
         return message
     }
 
-    sendMessage = async () => { //отсылаем текстовое сообщение
+    sendMessage = async (linkImage = null) => { //отсылаем текстовое сообщение
 
-        const {message, channel} = this.state
+        const {message, channel, link} = this.state
 
-        if(message.trim().length){ // проверяем на пробелы
+
+        if(message.trim().length || link){ // проверяем на пробелы
             //send message
 
             this.setState({loading: true})
             this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
-                await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`, this.createMessage())
-                .then(() => { //отсылаем на сервер get-запрос
+                await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`, this.createMessage(null, linkImage))
+                .then(() => { //записываем в БД ссылку, вытащенную из Storage
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
                 })
@@ -83,15 +91,14 @@ class MessageForm extends Component{
 
     uploadFile = (file, metadata) => { //манипуляции для storage firebase, половина тут мне не ясна и так
         const pathToUpload = this.state.channel.id
-        const ref = this.props.messagesRef
-        const filePath = `chat/public/${v4()}.jpg`
+        const filePath = `chat/public/${v4()}.jpg` //имя для Storage прописываем
 
         this.setState({
             uploadState: 'uploading',
-            uploadTask: this.state.storageRef.child(filePath).put(file, metadata)
+            uploadTask: this.state.storageRef.child(filePath).put(file, metadata) //грузим файл в Storage Firebase
         },
             () => {
-                this.state.uploadTask.on('state_changed', snap => { //ставим ограничение по размеру картинки
+                    this.state.uploadTask.on('state_changed', snap => { //ставим ограничение по размеру картинки
                     const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
                     this.setState({percentUploaded})
             }, err => {
@@ -104,8 +111,8 @@ class MessageForm extends Component{
                 })
 
             }, () => {
-                this.state.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => { //передаем в объект отсылки изображения, ссылку и место вставки в БД
-                    this.sendFileMessage(downloadURL, ref, pathToUpload)
+                this.state.uploadTask.snapshot.ref.getDownloadURL().then(downloadURL => { //получаем из Storage Firebase ссылку с картинкой
+                    this.sendFileMessage(downloadURL, pathToUpload) //передаем дальше ссылку для отправки в БД Firebase
                 })
                     .catch(err => this.setState({
                         error: this.state.errors.concat(err),
@@ -117,7 +124,18 @@ class MessageForm extends Component{
         })
     }
 
-    sendFileMessage = async (fileURl, ref, pathToUpload) => { //формируем объект для отправки картинки в БД
+    LinkImage = async linkURL => {
+        await this.sendMessage(linkURL) //передаем ссылку в sendMessage
+    }
+
+    linkFinished = bool => { //меняем статус ссылки, чтобы нас пропустил в sendMessage проверяльщик на пробелы
+        this.setState({
+            link: bool
+        })
+    }
+
+
+    sendFileMessage = async (fileURl, pathToUpload) => { //формируем объект для отправки картинки в БД
 
         this.setState({loading: true})
         this.props.updateData() //обновляем список сообщений после отсылки сообщения
@@ -179,7 +197,9 @@ class MessageForm extends Component{
                     <FileModal
                         modal={modal} //отслеживание открытия и закрытия модального окна
                         closeModal={this.closeModal} //при закрытии меняется стейт на закрытие
-                        uploadFile = {this.uploadFile}
+                        uploadFile = {this.uploadFile} //событие загрузки
+                        linkImage={this.LinkImage}
+                        linkFinished={this.linkFinished}
                     />
 
                 </Button.Group>

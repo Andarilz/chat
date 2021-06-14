@@ -9,10 +9,10 @@ const isOwnMessage = (message, user) => {
 }
 
 const isImage = message => {
-    return message.hasOwnProperty('image') && !message.hasOwnProperty('content')
+    return message.hasOwnProperty('image') && !message.hasOwnProperty('content') //определяем, пишем мы текст или картинку
 }
 
-const timeFromNow = timestamp => {
+const timeFromNow = timestamp => { //формируем таймштумп
     return moment(timestamp).fromNow()
 }
 

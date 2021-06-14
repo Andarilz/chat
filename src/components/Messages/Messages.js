@@ -9,7 +9,7 @@ import Message from "./Message";
 class Messages extends Component{
 
     state = {
-        messagesRef: firebase.database().ref('messages'),
+        messagesRef: firebase.database().ref('messages'), //по идее можно удалить, только надо из пропсов убрать
         channel: this.props.currentChannel,
         user: this.props.currentUser,
         messages: [],
