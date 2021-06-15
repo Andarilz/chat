@@ -51,7 +51,7 @@ class Channels extends Component{
         const firstChannel = this.state.channels[0]
 
         if(this.state.firstLoad && this.state.channels.length > 0){
-            this.props.setCurrentChannel(firstChannel)
+            this.props.setCurrentChannel(firstChannel) //добавляем в редакс первый канал для отображения егор названия
             this.setActiveChannel(firstChannel)
         }
         this.setState({firstLoad: false})
@@ -87,13 +87,13 @@ class Channels extends Component{
     displayChannels = channels => (
         channels.length > 0 && channels.map(channel => ( //пробегаемся по массиву каналов для его вывода
             <Menu.Item
-            key={channel.id}
-            onClick={() => this.changeChannel(channel)} //вставляем значение канала и передаем его в функцию смены канала
-            name={channel.name}
-            style={{
-                opacity: 0.7
-            }}
-            active={channel.id === this.state.activeChannel}
+                key={channel.id}
+                onClick={() => this.changeChannel(channel)} //вставляем значение канала и передаем его в функцию смены канала
+                name={channel.name}
+                style={{
+                    opacity: 0.7
+                }}
+                active={channel.id === this.state.activeChannel}
             >
                 #{channel.name}
             </Menu.Item>
@@ -110,7 +110,7 @@ class Channels extends Component{
 
     changeChannel = channel => { // запускаем функцию установки активного канала с переданным значением канала
         this.setActiveChannel(channel)
-        this.props.setCurrentChannel(channel)
+        this.props.setCurrentChannel(channel) //добавляем канал в редакс при смене канала
     }
 
     setActiveChannel = channel => { //вставляем в стейт значение текущего канала, полученное после пробежки по всем значениям каналов, полученных из БЖ
@@ -144,6 +144,7 @@ class Channels extends Component{
                 </Menu.Item>
 
                 {this.displayChannels(channels)}
+
 
             </Menu.Menu>
 
@@ -203,7 +204,7 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-    setCurrentChannel
+    setCurrentChannel //вставляем в стейт значния по каналам
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Channels)

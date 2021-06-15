@@ -7,7 +7,7 @@ class FileModal extends Component{
 
     state = {
         file: null,
-        authorized: ['img/jpeg', 'image/png'], //допустимые типы файлов
+        authorized: ['image/gif', 'image/png', 'image/jpeg'], //допустимые типы файлов
         linkFile: null
     }
 
@@ -24,10 +24,12 @@ class FileModal extends Component{
 
         const {uploadFile, closeModal} = this.props
 
+
         if(file !== null){
+
             if(this.isAuthorized(file.name)){
                 const metadata = { contentType: mime.lookup(file.name) }
-                uploadFile(file, metadata)
+                uploadFile(file, metadata) //грузим в Firebase Storage картинку
                 closeModal()
                 this.clearFile()
             }

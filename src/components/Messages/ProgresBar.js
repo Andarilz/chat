@@ -4,8 +4,6 @@ import {Progress} from "semantic-ui-react";
 
 const ProgressBar = ({uploadState, percentUploaded}) => {
 
-    console.log('bar', percentUploaded)
-
     return (
         uploadState === 'uploading' && (
             <Progress

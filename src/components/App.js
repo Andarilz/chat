@@ -21,8 +21,8 @@ const App = ({ currentUser, currentChannel }) => (
         <Grid.Column style={{marginLeft: 320}}>
             <Messages
                 key={currentChannel && currentChannel.id}
-                currentChannel={currentChannel}
-                currentUser={currentUser}
+                currentChannel={currentChannel} //передаем канал
+                currentUser={currentUser} // передаем пользователя
             />
         </Grid.Column>
 
@@ -33,8 +33,8 @@ const App = ({ currentUser, currentChannel }) => (
 )
 
 const mapStateToProps = state => ({
-    currentUser: state.user.currentUser,
-    currentChannel: state.channel.currentChannel
+    currentUser: state.user.currentUser, //получаем из редакса значение пользователя после реги
+    currentChannel: state.channel.currentChannel //получаем из редакса значение канала, передаваемое при смене канала из Channels
 })
 
 export default connect(mapStateToProps)(App)
