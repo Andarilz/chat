@@ -16,7 +16,10 @@ class Messages extends Component{
         messagesLoading: true,
         shouldLoading: false,
         progressBar: false,
-        numUniqueUsers: ''
+        numUniqueUsers: '',
+        searchTerm: '',
+        searchLoading: false,
+        searchResults: []
     }
 
     componentDidMount() {
@@ -34,6 +37,38 @@ class Messages extends Component{
         }
     }
 
+    handleSearchChange = event => { //при вводе данных в строку поиска
+        this.setState({
+            searchTerm: event.target.value.trim(), //вносим искомое значение без пробелов в стейт
+            searchLoading: true
+        }, () => this.handleSearchMessages()) //запускаем метод поиска
+    }
+
+    handleSearchMessages = () => {
+
+        console.log(this.state.searchLoading)
+
+        const channelMessages = [...this.state.messages] //получаем из стейта (а ранее - из БД) все сообщения
+        const regex = new RegExp(this.state.searchTerm, 'gi') //настраиваем глобальный поиск
+        const searchResults = channelMessages.reduce((acc, message) => { //пишем метод поиска совпадений
+            if(message.content && message.content.match(regex) || message.user.name.match(regex)){ //если в поле есть совпадение сообщения или имени
+                acc.push(message) //копим совпадения
+            }
+            return acc
+        }, [])
+
+        this.setState({
+            searchResults,
+        })
+
+
+        setTimeout(() => {
+            this.setState({
+                searchLoading: false
+            })
+        }, 500)
+
+    }
 
     addListeners = channelId => {
         this.addMessageListeners(channelId) //в дид маунте активируется
@@ -47,6 +82,7 @@ class Messages extends Component{
                 if(results){
                     const keysOfMessages = Object.keys(results)
                     const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства
+                    console.log(mess)
                     this.setState({
                         messages: mess,
                         messagesLoading: false
@@ -104,7 +140,7 @@ class Messages extends Component{
 
     render(){
 
-        const {messagesRef, channel, user, messages, progressBar, numUniqueUsers} = this.state
+        const {messagesRef, channel, user, messages, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading} = this.state
 
         return(
             <React.Fragment>
@@ -112,11 +148,13 @@ class Messages extends Component{
                 <MessagesHeader
                     channelName={this.displayChannelName(channel)}
                     numUniqueUsers={numUniqueUsers}
+                    handleSearchChange={this.handleSearchChange}
+                    searchLoading={searchLoading}
                 />
 
                 <Segment>
                     <Comment.Group className={progressBar ? 'messages__progress' : 'messages' }>
-                        {this.displayMessages(messages)}
+                        { searchTerm ? this.displayMessages(searchResults) : this.displayMessages(messages) }
                     </Comment.Group>
                 </Segment>
 
