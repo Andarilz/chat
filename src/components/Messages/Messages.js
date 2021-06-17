@@ -44,9 +44,7 @@ class Messages extends Component{
         }, () => this.handleSearchMessages()) //запускаем метод поиска
     }
 
-    handleSearchMessages = () => {
-
-        console.log(this.state.searchLoading)
+    handleSearchMessages = () => { //активация строки поиска
 
         const channelMessages = [...this.state.messages] //получаем из стейта (а ранее - из БД) все сообщения
         const regex = new RegExp(this.state.searchTerm, 'gi') //настраиваем глобальный поиск
@@ -80,9 +78,8 @@ class Messages extends Component{
                 const results = res.data || []
 
                 if(results){
-                    const keysOfMessages = Object.keys(results)
-                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства
-                    console.log(mess)
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
                     this.setState({
                         messages: mess,
                         messagesLoading: false
@@ -100,7 +97,6 @@ class Messages extends Component{
 
     countUniqUsers = messages => { //считаем уникальных пользлователей
         const uniqueUsers = messages.reduce((acc, message) => {
-            console.log(message, 'message')
             if(!acc.includes(message.user.name)){
                 acc.push(message.user.name)
             }
@@ -108,7 +104,7 @@ class Messages extends Component{
             return acc;
         }, [])
 
-        const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0
+        const plural = uniqueUsers.length > 1 || uniqueUsers.length === 0 //добавляем s после users
 
         const numUniqueUsers = `${uniqueUsers.length} user${plural ? 's' : ''}`
 
@@ -128,7 +124,7 @@ class Messages extends Component{
         )
     }
 
-    isProgressBarVisible = percent => {
+    isProgressBarVisible = percent => { // заполнение полоски загрузки
         if(percent > 0){
             this.setState({
                 progressBar: true

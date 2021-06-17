@@ -3,7 +3,7 @@ import {Comment, Image} from 'semantic-ui-react'
 import moment from 'moment'
 
 
-const isOwnMessage = (message, user) => {
+const isOwnMessage = (message, user) => { //проверяем, мы ли автор сообщения и добавляем класс
     return message.user.id === user.id ? 'message__self' : ''
 
 }
@@ -12,7 +12,7 @@ const isImage = message => {
     return message.hasOwnProperty('image') && !message.hasOwnProperty('content') //определяем, пишем мы текст или картинку
 }
 
-const timeFromNow = timestamp => { //формируем таймштумп
+const timeFromNow = timestamp => { //формируем таймштамп
     return moment(timestamp).fromNow()
 }
 

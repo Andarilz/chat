@@ -46,6 +46,8 @@ class Channels extends Component{
             })
     }
 
+
+
     setFirstChannel = () => { //автопрокрутка на первый канал
 
         const firstChannel = this.state.channels[0]
@@ -53,8 +55,8 @@ class Channels extends Component{
         if(this.state.firstLoad && this.state.channels.length > 0){
             this.props.setCurrentChannel(firstChannel) //добавляем в редакс первый канал для отображения егор названия
             this.setActiveChannel(firstChannel)
+            this.setState({firstLoad: false})
         }
-        this.setState({firstLoad: false})
 
     }
 
@@ -81,7 +83,6 @@ class Channels extends Component{
             .catch(e => {
                 console.err(e)
             })
-
     }
 
     displayChannels = channels => (

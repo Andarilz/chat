@@ -68,7 +68,7 @@ class MessageForm extends Component{
         const {message, channel, link} = this.state
 
 
-        if(message.trim().length || link){ // проверяем на пробелы
+        if(message.trim().length || link){ // проверяем на пробелы и на пустоту
             //send message
 
             this.setState({loading: true})
@@ -96,12 +96,12 @@ class MessageForm extends Component{
 
         this.setState({
             uploadState: 'uploading',
-            uploadTask: this.state.storageRef.child(filePath).put(file, metadata) //заполняем метаданными
+            uploadTask: this.state.storageRef.child(filePath).put(file, metadata) //формируем более удорбную переменную для активации в колл-бэке метода загрузки
         },
             () => {
-                    this.state.uploadTask.on('state_changed', snap => { //ставим ограничение по размеру картинки
-                    const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) * 100)
-                        this.props.isProgressBarVisible(percentUploaded)
+                    this.state.uploadTask.on('state_changed', snap => { //загружаем картинку в Storage
+                    const percentUploaded = Math.round((snap.bytesTransferred / snap.totalBytes) * 100) //процент загрузки выводим
+                        this.props.isProgressBarVisible(percentUploaded) //передаем процент загрузки
                         this.setState({percentUploaded})
             }, err => {
                 console.error(err)
@@ -130,7 +130,7 @@ class MessageForm extends Component{
         await this.sendMessage(linkURL) //передаем ссылку в sendMessage
     }
 
-    linkFinished = bool => { //меняем статус ссылки, чтобы нас пропустил в sendMessage проверяльщик на пробелы
+    linkFinished = bool => { //меняем статус ссылки, чтобы нас пропустил в sendMessage проверяльщик на пробелы и на пустоту
         this.setState({
             link: bool
         })
@@ -141,13 +141,11 @@ class MessageForm extends Component{
         this.setState({loading: true})
         this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
-        console.log(4)
-
         await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${pathToUpload}.json`, this.createMessage(fileURl))
             .then(() => { //отсылаем картинку в БД
                 console.log(5)
                 this.setState({loading: false, errors: [], message: '', rerenderComp: false, uploadState: 'done'})//чистим стейт
-                this.props.updateData()//активируем коллбэк в компоненте Messages для повторного get-запроса к БД и обновления списка сообщений
+                this.props.updateData()//активируем коллбэк в компоненте Messages для будущего get-запроса к БД и обновления списка сообщений
             })
             .catch(e => {
                 console.error(e)

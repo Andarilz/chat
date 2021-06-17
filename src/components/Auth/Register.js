@@ -73,8 +73,9 @@ export default class Register extends Component{
         console.log('reg1')
         // работает
          await axios.post('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json', {
-            name: createdUser.user.displayName,
-            avatar: createdUser.user.photoURL
+             name: createdUser.user.displayName,
+             avatar: createdUser.user.photoURL,
+             uid: createdUser.user.uid
         })
 
         //поменять значения, delete для удаления значения

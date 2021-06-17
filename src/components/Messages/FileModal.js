@@ -12,7 +12,7 @@ class FileModal extends Component{
     }
 
     addFile = event => {
-        const file = event.target.files[0]
+        const file = event.target.files[0] //берем загруженный крайний файл
 
         if(file){
             this.setState({file})
@@ -27,15 +27,15 @@ class FileModal extends Component{
 
         if(file !== null){
 
-            if(this.isAuthorized(file.name)){
+            if(this.isAuthorized(file.name)){ // если прошел проверку по типам файлов, зарешенных нами
                 const metadata = { contentType: mime.lookup(file.name) }
-                uploadFile(file, metadata) //грузим в Firebase Storage картинку
-                closeModal()
-                this.clearFile()
+                uploadFile(file, metadata) // грузим в Firebase Storage картинку
+                closeModal() // закрываем окно
+                this.clearFile() // чистим переменные
             }
-        } else if(linkFile !== null){
-                this.props.linkImage(linkFile)
-                this.props.linkFinished(true)
+        } else if(linkFile !== null){ // если в ссылке на отображение картинки, что-то вписано
+                this.props.linkImage(linkFile) //передаем ссылку
+                this.props.linkFinished(true) //передаем коллбэк-перемнную с индикатором успешной передачи ссылки, чтобы
                 closeModal()
                 this.clearFile()
         }
@@ -43,9 +43,9 @@ class FileModal extends Component{
 
     isAuthorized = filename => this.state.authorized.includes(mime.lookup(filename)) //проверяем типы файлов
 
-    clearFile = () => this.setState({file: null, linkFile: null})
+    clearFile = () => this.setState({file: null, linkFile: null}) //чистим стейт
 
-    addLinkFile = event => {
+    addLinkFile = event => { //передаем ссылку на загрузку отображение картинки
         this.setState({
             [event.target.name]: event.target.value
         })
