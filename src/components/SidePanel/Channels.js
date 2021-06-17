@@ -135,7 +135,7 @@ class Channels extends Component{
 
             <Fragment>
 
-            <Menu.Menu style={{ paddingBottom: '2em' }}>
+            <Menu.Menu className='menu'>
                 <Menu.Item>
                     <span>
                         <Icon name='exchange' /> CHANNELS
