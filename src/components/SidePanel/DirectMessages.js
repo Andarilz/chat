@@ -13,13 +13,17 @@ class DirectMessages extends Component{
         user: this.props.currentUser,
         usersRef: firebase.database().ref('users'),
         connectedRef: firebase.database().ref('.info/connected'),
-        presenceRef: firebase.database().ref('presence')
+        presenceRef: firebase.database().ref('presence'),
+        activeChannel: ''
     }
 
     componentDidMount() {
         if(this.state.user){
             this.addListeners(this.state.user.uid)
         }
+
+         axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages.json`)
+             .then(res => console.log(res.data))
 
     }
 
@@ -153,23 +157,28 @@ class DirectMessages extends Component{
          }
          this.props.setCurrentChannel(channelData)
          this.props.setPrivateChannel(true)
+         this.setActivateChannel(user.uid)
+     }
+
+     setActivateChannel = userId => {
+        this.setState({
+            activeChannel: userId
+        })
      }
 
      getChannelId = userId => {
          const currentUserId = this.state.user.uid
-         //     return userId < currentUserId ?
-         //         `${userId}/${currentUserId}`:
-         //         `${currentUserId}/${userId}`
-         // }
+             return userId < currentUserId ?
+                 `${userId}/${currentUserId}`:
+                 `${currentUserId}/${userId}`
+         }
 
-         return `${userId}/${currentUserId}/Mirzoev`
-
-     }
+         // return `${userId}/${currentUserId}`
 
 
      render(){
 
-        const {users} = this.state
+        const {users, activeChannel} = this.state
 
         return(
 
@@ -184,6 +193,7 @@ class DirectMessages extends Component{
                 {users.map(user => (
                     <Menu.Item
                         key={user.uid}
+                        active={user.uid === activeChannel}
                         onClick={() => this.changeChannel(user)}
                         style={{
                             opacity: 0.7,

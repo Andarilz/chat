@@ -8,7 +8,7 @@ import MetaPenal from "./MetaPenal/MetaPenal";
 import {connect} from "react-redux";
 
 
-const App = ({ currentUser, currentChannel }) => (
+const App = ({ currentUser, currentChannel, isPrivateChannel }) => (
     <Grid columns='equal' className='app' style={{
         background: '#eee'
     }}>
@@ -23,6 +23,7 @@ const App = ({ currentUser, currentChannel }) => (
                 key={currentChannel && currentChannel.id}
                 currentChannel={currentChannel} //передаем канал
                 currentUser={currentUser} // передаем пользователя
+                isPrivateChannel={isPrivateChannel}
             />
         </Grid.Column>
 
@@ -34,7 +35,8 @@ const App = ({ currentUser, currentChannel }) => (
 
 const mapStateToProps = state => ({
     currentUser: state.user.currentUser, //получаем из редакса значение пользователя после реги
-    currentChannel: state.channel.currentChannel //получаем из редакса значение канала, передаваемое при смене канала из Channels
+    currentChannel: state.channel.currentChannel, //получаем из редакса значение канала, передаваемое при смене канала из Channels
+    isPrivateChannel: state.channel.isPrivateChannel
 })
 
 export default connect(mapStateToProps)(App)

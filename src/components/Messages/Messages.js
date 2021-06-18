@@ -19,7 +19,8 @@ class Messages extends Component{
         numUniqueUsers: '',
         searchTerm: '',
         searchLoading: false,
-        searchResults: []
+        searchResults: [],
+        PrivateChannel: this.props.isPrivateChannel
     }
 
     componentDidMount() {
@@ -72,8 +73,17 @@ class Messages extends Component{
         this.addMessageListeners(channelId) //в дид маунте активируется
     }
 
+
     addMessageListeners = async channelId => { //делаем запрос к бд для получения данных
-        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`)
+
+        const creatingURL = this.props.isPrivateChannel
+            ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channelId}.json`
+            : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`
+
+        console.log('channel', channelId)
+
+
+        await axios.get(creatingURL)
             .then(res => {
                 const results = res.data || []
 
@@ -132,11 +142,13 @@ class Messages extends Component{
         }
     }
 
-    displayChannelName = channel => channel ? `#${channel.name}` : ''
+    displayChannelName = channel => {
+        return channel && `${this.state.PrivateChannel ? '@' : '#'}${channel.name}`
+    }
 
     render(){
 
-        const {messagesRef, channel, user, messages, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading} = this.state
+        const {messagesRef, channel, user, messages, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, PrivateChannel} = this.state
 
         return(
             <React.Fragment>
@@ -146,6 +158,7 @@ class Messages extends Component{
                     numUniqueUsers={numUniqueUsers}
                     handleSearchChange={this.handleSearchChange}
                     searchLoading={searchLoading}
+                    isPrivateChannel={PrivateChannel}
                 />
 
                 <Segment>
@@ -160,6 +173,7 @@ class Messages extends Component{
                     currentUser={user}
                     updateData={this.updateData}
                     isProgressBarVisible={this.isProgressBarVisible}
+                    isPrivateChannel={PrivateChannel}
                 />
 
             </React.Fragment>

@@ -65,7 +65,7 @@ class MessageForm extends Component{
 
     sendMessage = async (linkImage = null) => { //отсылаем текстовое сообщение
 
-        const {message, channel, link} = this.state
+        const {message, channel, link, user} = this.state
 
 
         if(message.trim().length || link){ // проверяем на пробелы и на пустоту
@@ -74,7 +74,17 @@ class MessageForm extends Component{
             this.setState({loading: true})
             this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
-                await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`, this.createMessage(null, linkImage))
+
+            const creatingURL = this.props.isPrivateChannel
+                ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
+                : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`
+
+            console.log(channel.id, 'post-channel')
+
+            console.log(user.uid, 'post-user')
+
+                await axios.post(creatingURL, this.createMessage(null, linkImage))
+
                 .then(() => { //записываем в БД ссылку, вытащенную из Storage
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
@@ -90,9 +100,18 @@ class MessageForm extends Component{
         }
     }
 
+    getPath = () => {
+        if(this.props.isPrivateChannel){
+            return `chat/private-${this.state.channel.id}`
+        } else {
+            return `chat/public`
+        }
+    }
+
     uploadFile = (file, metadata) => { //функция-коллбэк, передаваемая в модальное окно, которая грузит картинку в storage firebase
         const pathToUpload = this.state.channel.id
-        const filePath = `chat/public/${v4()}.jpg` //имя для Storage прописываем
+        // const filePath = `chat/public/${v4()}.jpg` //имя для Storage прописываем
+        const filePath = `${this.getPath()}/${v4()}.jpg`
 
         this.setState({
             uploadState: 'uploading',
