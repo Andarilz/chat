@@ -2,7 +2,7 @@ import React, {Fragment, Component} from 'react'
 import {Menu, Icon, Modal, Form, Input, Button} from 'semantic-ui-react'
 import firebase from "../../Firebase/Firebase";
 import axios from "axios";
-import {setCurrentChannel} from "../../actions";
+import {setCurrentChannel, setPrivateChannel} from "../../actions";
 import {connect} from "react-redux";
 
 
@@ -112,6 +112,7 @@ class Channels extends Component{
     changeChannel = channel => { // запускаем функцию установки активного канала с переданным значением канала
         this.setActiveChannel(channel)
         this.props.setCurrentChannel(channel) //добавляем канал в редакс при смене канала
+        this.props.setPrivateChannel(false)
     }
 
     setActiveChannel = channel => { //вставляем в стейт значение текущего канала, полученное после пробежки по всем значениям каналов, полученных из БЖ
@@ -205,7 +206,8 @@ const mapStateToProps = state => {
 }
 
 const mapDispatchToProps = {
-    setCurrentChannel //вставляем в стейт значния по каналам
+    setCurrentChannel, //вставляем в стейт значния по каналам
+    setPrivateChannel
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Channels)
