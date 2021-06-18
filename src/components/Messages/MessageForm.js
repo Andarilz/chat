@@ -79,9 +79,6 @@ class MessageForm extends Component{
                 ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
                 : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`
 
-            console.log(channel.id, 'post-channel')
-
-            console.log(user.uid, 'post-user')
 
                 await axios.post(creatingURL, this.createMessage(null, linkImage))
 

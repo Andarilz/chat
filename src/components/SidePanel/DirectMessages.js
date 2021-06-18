@@ -22,16 +22,13 @@ class DirectMessages extends Component{
             this.addListeners(this.state.user.uid)
         }
 
-         axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages.json`)
-             .then(res => console.log(res.data))
-
     }
 
      addListeners = async currentUserUid => {
         let loadedUsers = []
 
          await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
-             .then(res => {
+             .then(res => {//получаем всех пользователей
                  const results = res.data || []
 
                  if (results) {
@@ -80,84 +77,18 @@ class DirectMessages extends Component{
          }
 
 
-
-         // this.state.usersRef.on('child_added', snap => {
-         //     if(currentUserUid !== snap.key){
-         //         let user = snap.val()
-         //
-         //         user['uid'] = snap.key
-         //
-         //         user['status'] = 'offline'
-         //
-         //         loadedUsers.push(user)
-         //
-         //         this.setState({
-         //             users: loadedUsers
-         //         })
-         //     }
-         // })
-
-
-
-
-
-
-     //     this.state.connectedRef.on('value', snap => { //проверяем их статус
-     //         if(snap.val() === true){
-     //             const ref = this.state.presenceRef.child(currentUserUid)
-     //             console.log(ref, 'ref')
-     //                 ref.set(true)
-     //                 ref.onDisconnect().remove(err => {
-     //                     if(err !== null){
-     //                         console.error(err)
-     //                     }
-     //             })
-     //         }
-     //     })
-     //
-     //     this.state.presenceRef.on('child_added', snap => {
-     //         if(currentUserUid !== snap.key){
-     //             //add status to user
-     //             this.addStatusToUser(snap.key) //передаем статус
-     //         }
-     //     })
-     //
-     //     this.state.presenceRef.on('child_removed', snap => {
-     //         if(currentUserUid !== snap.key){
-     //             //add status to user
-     //             this.addStatusToUser(snap.key, false) //передаем статус
-     //         }
-     //     })
-     // }
-     //
-     //
-     //
-     //
-     // addStatusToUser = (userId, connected = true) => { //добавляем статус для будущей проверки и добавления класса
-     //    const updatedUsers = this.state.users.reduce((acc, user) => {
-     //        if(user.uid === userId){
-     //            user['status'] = `${connected ? 'online' : 'offline'}`
-     //        }
-     //        return acc.concat(user)
-     //    }, [])
-     //
-     //     this.setState({
-     //         user: updatedUsers
-     //     })
-     // }
-     //
      isUserOnline = user => user.status === 'online' //проверка на онлайн для добавления класса
 
-     changeChannel = user => {
+     changeChannel = user => { //меняем канала при клике на имя в директе
          const channelId = this.getChannelId(user.uid)
          const channelData = {
              id: channelId,
              name: user.name,
 
          }
-         this.props.setCurrentChannel(channelData)
-         this.props.setPrivateChannel(true)
-         this.setActivateChannel(user.uid)
+         this.props.setCurrentChannel(channelData) //меняем в редаксе тккущий канал на сформированный
+         this.props.setPrivateChannel(true) //меняем маркет приватного канала для отображения хэдера более корректного у приватных и неприватных каналов
+         this.setActivateChannel(user.uid) //стили активного канала приписываем
      }
 
      setActivateChannel = userId => {
@@ -166,14 +97,17 @@ class DirectMessages extends Component{
         })
      }
 
-     getChannelId = userId => {
+     getChannelId = userId => { //самое важное!!!
+        // Мы берем текущий наш айти и айди нашего желаемого друга по переписке и меняем их местами,
+         // в зависимости от того, за кого мы сейчас зашли.
+         // В итоге, в пуш-хапросе у нас одна последовательность, а в гет-запросе - другая.
+         // Во итогу 2 человека могут видеть лишь свои сообщения
          const currentUserId = this.state.user.uid
              return userId < currentUserId ?
                  `${userId}/${currentUserId}`:
                  `${currentUserId}/${userId}`
          }
 
-         // return `${userId}/${currentUserId}`
 
 
      render(){

@@ -80,8 +80,6 @@ class Messages extends Component{
             ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channelId}.json`
             : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`
 
-        console.log('channel', channelId)
-
 
         await axios.get(creatingURL)
             .then(res => {
