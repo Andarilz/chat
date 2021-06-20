@@ -4,8 +4,7 @@ import moment from 'moment'
 
 
 const isOwnMessage = (message, user) => { //проверяем, мы ли автор сообщения и добавляем класс
-    return message.user.id === user.id ? 'message__self' : ''
-
+    return message.user.id === user.uid ? 'message__self' : ''
 }
 
 const isImage = message => {

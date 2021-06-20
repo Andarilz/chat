@@ -8,30 +8,38 @@ import MetaPenal from "./MetaPenal/MetaPenal";
 import {connect} from "react-redux";
 
 
-const App = ({ currentUser, currentChannel, isPrivateChannel }) => (
-    <Grid columns='equal' className='app' style={{
-        background: '#eee'
-    }}>
-        <ColorPenal />
-        <SidePanel
-            currentUser={currentUser}
-            key={currentUser && currentUser.uid}
-        />
+const App = ({ currentUser, currentChannel, isPrivateChannel }) => {
 
-        <Grid.Column style={{marginLeft: 320}}>
-            <Messages
-                key={currentChannel && currentChannel.id}
-                currentChannel={currentChannel} //передаем канал
-                currentUser={currentUser} // передаем пользователя
-                isPrivateChannel={isPrivateChannel}
+
+    return (
+        <Grid columns='equal' className='app' style={{
+            background: '#eee'
+        }}>
+            <ColorPenal />
+            <SidePanel
+                currentUser={currentUser}
+                key={currentUser && currentUser.uid}
             />
-        </Grid.Column>
 
-        <Grid.Column width={4}>
-            <MetaPenal />
-        </Grid.Column>
-    </Grid>
-)
+            <Grid.Column style={{marginLeft: 320}}>
+                <Messages
+                    key={currentChannel && currentChannel.id}
+                    currentChannel={currentChannel} //передаем канал
+                    currentUser={currentUser} // передаем пользователя
+                    isPrivateChannel={isPrivateChannel}
+                />
+            </Grid.Column>
+
+            <Grid.Column width={4}>
+                <MetaPenal
+                    isPrivateChannel={isPrivateChannel}
+                    key={currentChannel && currentChannel.id}
+                    currentChannel={currentChannel}
+                />
+            </Grid.Column>
+        </Grid>
+    )
+}
 
 const mapStateToProps = state => ({
     currentUser: state.user.currentUser, //получаем из редакса значение пользователя после реги

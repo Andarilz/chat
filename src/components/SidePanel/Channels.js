@@ -4,6 +4,7 @@ import firebase from "../../Firebase/Firebase";
 import axios from "axios";
 import {setCurrentChannel, setPrivateChannel} from "../../actions";
 import {connect} from "react-redux";
+import {counterZero, counterUp} from "../../actions";
 
 
 class Channels extends Component{
@@ -16,7 +17,10 @@ class Channels extends Component{
         channelDetails: '',
         channelsRef: firebase.database().ref('channels'),
         firstLoad: true,
-        activeChannel: ''
+        activeChannel: '',
+        channel: null,
+        notifications: [],
+        counterMess: 0
     }
 
     componentDidMount() {
@@ -38,14 +42,80 @@ class Channels extends Component{
                     return data[key]
                })
 
-                this.setState( {channels}, () => this.setFirstChannel())
-
-                // this.setState( {channels}, () => this.setActiveChannel(this.state.channels[this.state.channels.length - 1]))
-
+                this.setState( {channels}, () => this.setFirstChannel()) //вписываем первый канал в активные при перезагрузке
 
             })
     }
 
+    //notification
+
+    //по отсылке сообщения
+
+    //
+    // addNotificationListener = async channelId => {
+    //
+    //     console.log(2)
+    //
+    //     await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`)
+    //
+    //         .then(res => {
+    //
+    //             console.log(3)
+    //             const results = res.data || []
+    //
+    //             const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+    //             const snap = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив да
+    //
+    //                 // console.log('axios note')
+    //
+    //             if(this.state.channel){
+    //                 this.handleNotifications(channelId, this.state.channel.id, this.state.notifications, snap)
+    //                 // console.log('axios inner note')
+    //             }
+    //         })
+    //
+    // }
+    //
+    // handleNotifications = (channelId, currentChannelId, notifications, snap) => {
+    //
+    //     // console.log(channelId)
+    //
+    //     // console.log(1)
+    //
+    //     let lastTotal = 0;
+    //
+    //     let index = notifications.findIndex(notification => notification.id === channelId)
+    //
+    //     if(index !== -1){
+    //
+    //         if(channelId !== currentChannelId){
+    //             lastTotal = notifications[index].total
+    //
+    //             if(((snap.length) - lastTotal) > 0){
+    //                 notifications[index].count = (snap.length) - lastTotal
+    //             }
+    //         }
+    //
+    //         notifications[index].lastKnownTotal = snap.length
+    //
+    //     } else {
+    //         notifications.push({
+    //             id: channelId,
+    //             total: snap.length,
+    //             lastKnownTotal: snap.length,
+    //             count: 0
+    //         })
+    //     }
+    //
+    //     this.setState({
+    //         notifications
+    //     })
+    //
+    //     console.log(this.state.notifications)
+    //
+    // }
+
+    //notification
 
 
     setFirstChannel = () => { //автопрокрутка на первый канал
@@ -113,6 +183,10 @@ class Channels extends Component{
         this.setActiveChannel(channel)
         this.props.setCurrentChannel(channel) //добавляем канал в редакс при смене канала
         this.props.setPrivateChannel(false)
+        this.setState({
+            channel //при смене канала активируем нотификации,
+        })
+
     }
 
     setActiveChannel = channel => { //вставляем в стейт значение текущего канала, полученное после пробежки по всем значениям каналов, полученных из БЖ
@@ -201,13 +275,16 @@ class Channels extends Component{
 
 const mapStateToProps = state => {
     return {
-        channel: state.channel
+        channel: state.channel,
+        counter: state.counter
     }
 }
 
 const mapDispatchToProps = {
     setCurrentChannel, //вставляем в стейт значния по каналам
-    setPrivateChannel
+    setPrivateChannel,
+    counterUp,
+    counterZero
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Channels)

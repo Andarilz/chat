@@ -71,12 +71,29 @@ export default class Register extends Component{
 
     saveUser = async createdUser => {
         console.log('reg1')
-        // работает
-         await axios.post('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json', {
+        //работает
+         await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`, {
              name: createdUser.user.displayName,
              avatar: createdUser.user.photoURL,
              uid: createdUser.user.uid
         })
+
+        console.log({
+            name: createdUser.user.displayName,
+            avatar: createdUser.user.photoURL,
+            uid: createdUser.user.uid
+        })
+
+        // await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`, {
+        //     [createdUser.user.uid]: {
+        //         name: createdUser.user.displayName,
+        //         avatar: createdUser.user.photoURL,
+        //         uid: createdUser.user.uid
+        //     }
+        // })
+
+
+        // https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${this.state.user.uid}
 
         //поменять значения, delete для удаления значения
         // await axios.patch('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json', {

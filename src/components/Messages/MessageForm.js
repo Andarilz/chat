@@ -5,6 +5,8 @@ import axios from 'axios'
 import FileModal from './FileModal'
 import {v4} from 'uuid'
 import ProgressBar from "./ProgresBar";
+import {connect} from "react-redux";
+import {counterUp, counterZero} from "../../actions";
 
 
 class MessageForm extends Component{
@@ -85,6 +87,8 @@ class MessageForm extends Component{
                 .then(() => { //записываем в БД ссылку, вытащенную из Storage
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
+                    this.props.counterUp()
+                    console.log(this.props.counter, 'counter')
                 })
                 .catch(e => {
                     console.error(e)
@@ -155,6 +159,7 @@ class MessageForm extends Component{
     sendFileMessage = async (fileURl, pathToUpload) => { //формируем объект для отправки картинки в БД
 
         this.setState({loading: true})
+
         this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
         await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${pathToUpload}.json`, this.createMessage(fileURl))
@@ -162,6 +167,8 @@ class MessageForm extends Component{
                 console.log(5)
                 this.setState({loading: false, errors: [], message: '', rerenderComp: false, uploadState: 'done'})//чистим стейт
                 this.props.updateData()//активируем коллбэк в компоненте Messages для будущего get-запроса к БД и обновления списка сообщений
+                this.props.counterUp()
+                console.log(this.props.counter, 'counter')
             })
             .catch(e => {
                 console.error(e)
@@ -237,4 +244,10 @@ class MessageForm extends Component{
     }
 }
 
-export default MessageForm
+const mapStateToProps = state => {
+    return {
+        counter: state.counter
+    }
+}
+
+export default connect(mapStateToProps, {counterUp, counterZero})(MessageForm)

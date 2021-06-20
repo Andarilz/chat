@@ -5,6 +5,9 @@ import MessageForm from "./MessageForm";
 import firebase from "../../Firebase/Firebase";
 import axios from 'axios'
 import Message from "./Message";
+import {connect} from "react-redux";
+import {setUserPosts} from "../../actions";
+
 
 class Messages extends Component{
 
@@ -20,7 +23,8 @@ class Messages extends Component{
         searchTerm: '',
         searchLoading: false,
         searchResults: [],
-        PrivateChannel: this.props.isPrivateChannel
+        PrivateChannel: this.props.isPrivateChannel,
+        isChannelStarred: false
     }
 
     componentDidMount() {
@@ -36,13 +40,39 @@ class Messages extends Component{
         if(channel && user){
             this.addListeners(channel.id)
         }
+
     }
+
 
     handleSearchChange = event => { //при вводе данных в строку поиска
         this.setState({
             searchTerm: event.target.value.trim(), //вносим искомое значение без пробелов в стейт
             searchLoading: true
         }, () => this.handleSearchMessages()) //запускаем метод поиска
+    }
+
+    handleStar = () => {
+        this.setState({
+            isChannelStarred: !this.state.isChannelStarred
+        }, () => this.starChannel())
+    }
+
+    starChannel = async () => {
+        if(this.state.isChannelStarred){
+            console.log('star')
+
+
+
+
+            // await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/starred/${[this.state.channel.id]}.json`,{
+            //     id: this.state.channel.id
+            // })
+        }
+
+        else {
+            // await axios.delete(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/starred/${this.state.channel.id}.json`)
+                console.log('unstar')
+        }
     }
 
     handleSearchMessages = () => { //активация строки поиска
@@ -88,12 +118,15 @@ class Messages extends Component{
                 if(results){
                     const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
                     const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
                     this.setState({
                         messages: mess,
-                        messagesLoading: false
+                        messagesLoading: false,
                     })
 
+
                     this.countUniqUsers(mess)
+                    this.countUserPosts(mess)
                 }else{
                     this.setState({
                         messages: '',
@@ -101,6 +134,31 @@ class Messages extends Component{
                     })
                 }
             })
+    }
+
+    countUserPosts = messages => {
+
+        // messages.reduce((acc, message) =>{
+        //     console.log(message.user.name)
+        // }, [])
+
+        let usersPosts = messages.reduce((acc, message) => {
+
+            if(message.user.name in acc){
+                acc[message.user.name].count += 1
+            } else {
+                acc[message.user.name] = {
+                    avatar: message.user.avatar,
+                    count: 1
+                }
+            }
+
+            return acc
+
+
+        }, {})
+
+        this.props.setUserPosts(usersPosts)
     }
 
     countUniqUsers = messages => { //считаем уникальных пользлователей
@@ -146,7 +204,8 @@ class Messages extends Component{
 
     render(){
 
-        const {messagesRef, channel, user, messages, progressBar, numUniqueUsers, searchTerm, searchResults, searchLoading, PrivateChannel} = this.state
+        const {messagesRef, channel, user, messages, progressBar, numUniqueUsers, searchTerm,
+            searchResults, searchLoading, PrivateChannel, isChannelStarred} = this.state
 
         return(
             <React.Fragment>
@@ -157,6 +216,8 @@ class Messages extends Component{
                     handleSearchChange={this.handleSearchChange}
                     searchLoading={searchLoading}
                     isPrivateChannel={PrivateChannel}
+                    handleStar={this.handleStar}
+                    isChannelStarred={isChannelStarred}
                 />
 
                 <Segment>
@@ -179,4 +240,6 @@ class Messages extends Component{
     }
 }
 
-export default Messages
+
+
+export default connect(null, {setUserPosts})(Messages)

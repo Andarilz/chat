@@ -22,6 +22,7 @@ class DirectMessages extends Component{
             this.addListeners(this.state.user.uid)
         }
 
+        console.log(this.props.currentUser)
     }
 
      addListeners = async currentUserUid => {
@@ -122,32 +123,41 @@ class DirectMessages extends Component{
                         <Icon name='mail'/> DIRECT MESSAGES
                     </span> {' '}
                     ({users.length})
+                    {/*{убираем 1 единицу из длинны оторажаемых сообщений в директ потому, что это - письмо самому себе}*/}
                 </Menu.Item>
                 {/*{Users to send Direct messages}*/}
-                {users.map(user => (
-                    <Menu.Item
-                        key={user.uid}
-                        active={user.uid === activeChannel}
-                        onClick={() => this.changeChannel(user)}
-                        style={{
-                            opacity: 0.7,
-                            fontStyle: 'italic',
+                { users.map(user => {
+                    return (
+                        <Menu.Item
+                            key={user.uid}
+                            active={user.uid === activeChannel}
+                            onClick={() => this.changeChannel(user)}
+                            style={{
+                                opacity: 0.7,
+                                fontStyle: 'italic',
 
-                        }}
-                    >
+                            }}
+                        >
 
-                        <Icon
-                        name='circle'
-                        color={this.isUserOnline(user) ? 'green' : 'red'}
-                        />
+                            <Icon
+                                name='circle'
+                                color={this.isUserOnline(user) ? 'green' : 'red'}
+                            />
 
-                        @{user.name}
+                            @{user.name}
 
-                    </Menu.Item>
-                ))}
+                        </Menu.Item>
+                            )})
+                }
             </Menu.Menu>
         )
     }
 }
 
-export default connect(null, {setCurrentChannel, setPrivateChannel})(DirectMessages)
+const mapStateToProps = state => {
+    return {
+        channel: state.channel
+    }
+}
+
+export default connect(mapStateToProps, {setCurrentChannel, setPrivateChannel})(DirectMessages)
