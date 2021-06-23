@@ -41,11 +41,12 @@ class UserPanel extends Component{
 
          const {user} = this.state
 
+        const {primaryColor} = this.props
+
         return(
             <Grid style={{
-                background: '#4c3c4c'
+                background: primaryColor
             }}>
-
 
                 <Grid.Column>
                     <Grid.Row style={{

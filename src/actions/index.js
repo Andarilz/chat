@@ -1,5 +1,13 @@
 import * as actionTypes from './types'
-import {MESS_COUNT, MESS_ZERO, SET_CURRENT_CHANNEL, SET_PRIVATE_CHANNEL, SET_USER, SET_USER_POSTS} from "./types";
+import {
+    MESS_COUNT,
+    MESS_ZERO,
+    SET_COLORS,
+    SET_CURRENT_CHANNEL,
+    SET_PRIVATE_CHANNEL,
+    SET_USER,
+    SET_USER_POSTS
+} from "./types";
 
 //Users actions
 
@@ -55,6 +63,18 @@ export const setUserPosts = userPosts => {
         type: SET_USER_POSTS,
         payload: {
             userPosts
+        }
+    }
+}
+
+// Color actions
+
+export const setColors = (primary, secondary) => {
+    return {
+        type: SET_COLORS,
+        payload: {
+            primary,
+            secondary
         }
     }
 }

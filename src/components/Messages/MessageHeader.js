@@ -3,6 +3,12 @@ import { Header, Segment, Input, Icon } from 'semantic-ui-react'
 
 
 class MessagesHeader extends Component{
+
+    state = {
+    }
+
+    handleStar
+
     render(){
 
         const {channelName, numUniqueUsers, handleSearchChange, searchLoading, isPrivateChannel,
@@ -22,11 +28,9 @@ class MessagesHeader extends Component{
 
                         {!isPrivateChannel && (
                             <Icon
-                                // onClick={handleStar}
-                                // name={isChannelStarred ? 'star' : 'star outline'}
-                                // color={isChannelStarred ? 'yellow' : 'black'}
-                                name={'star outline'}
-                                color={'yellow'}
+                                onClick={handleStar}
+                                name={isChannelStarred ? 'star' : 'star outline'}
+                                color={isChannelStarred ? 'yellow' : 'black'}
                             />
                             )}
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import './App.css'
-import { Grid } from "semantic-ui-react";
+import { Grid, Segment } from "semantic-ui-react";
 import ColorPenal from "./ColorPental/ColorPental";
 import SidePanel from "./SidePanel/SidePanel";
 import Messages from "./Messages/Messages";
@@ -8,17 +8,19 @@ import MetaPenal from "./MetaPenal/MetaPenal";
 import {connect} from "react-redux";
 
 
-const App = ({ currentUser, currentChannel, isPrivateChannel }) => {
-
+const App = ({ currentUser, currentChannel, isPrivateChannel, primary, secondary }) => {
 
     return (
         <Grid columns='equal' className='app' style={{
-            background: '#eee'
+            background: secondary
         }}>
-            <ColorPenal />
+
+            <ColorPenal currentUser={currentUser} />
+
             <SidePanel
                 currentUser={currentUser}
                 key={currentUser && currentUser.uid}
+                primaryColor={primary}
             />
 
             <Grid.Column style={{marginLeft: 320}}>
@@ -44,7 +46,9 @@ const App = ({ currentUser, currentChannel, isPrivateChannel }) => {
 const mapStateToProps = state => ({
     currentUser: state.user.currentUser, //получаем из редакса значение пользователя после реги
     currentChannel: state.channel.currentChannel, //получаем из редакса значение канала, передаваемое при смене канала из Channels
-    isPrivateChannel: state.channel.isPrivateChannel
+    isPrivateChannel: state.channel.isPrivateChannel,
+    primary: state.colors.primary,
+    secondary: state.colors.secondary
 })
 
 export default connect(mapStateToProps)(App)

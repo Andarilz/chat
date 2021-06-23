@@ -11,3 +11,5 @@ export const MESS_COUNT = 'MESS_COUNT'
 export const MESS_ZERO = 'MESS_ZERO'
 
 export const SET_USER_POSTS = 'SET_USER_POSTS'
+
+export const SET_COLORS = 'SET_COLORS'

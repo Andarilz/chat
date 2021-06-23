@@ -22,6 +22,7 @@ class Root extends React.Component {
     componentDidMount() {
 
         firebase.auth().onAuthStateChanged(user => { //проверка входа
+            console.log('user', user)
             if(user){ //был вход
                 this.props.setUser(user) //передаем в редакс значение по пользователю вошедшему
                 // this.props.history.push('/') //редирект при регистрации

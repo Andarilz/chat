@@ -57,21 +57,97 @@ class Messages extends Component{
         }, () => this.starChannel())
     }
 
+    //put
+
+    addUsersListeners = async (starred) => { //делаем запрос к бд для получения данных
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+            .then(res => {
+                const results = res.data || []
+
+                if(results){
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
+
+                    mess.map((el, i) => {
+                        if(el.uid === this.state.user.uid){
+                            this.setState({
+                                userCounter: i
+                            })
+                        }
+                    })
+
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+
+                    if(usersCorrectKey){
+                        this.setState({
+                            userCorrectData: results[usersCorrectKey],
+                            usersCorrectKey //id в firebase
+                        })
+
+                        if(this.state.userCorrectData && starred){
+                            this.setState({
+                                avatar: this.state.userCorrectData.avatar,
+                                name: this.state.userCorrectData.name,
+                                uid: this.state.userCorrectData.uid,
+                            })
+
+                            if(this.state.userCorrectData.color){
+                                this.setState({
+                                    color: this.state.userCorrectData.color
+                                })
+                            }
+                            this.afterGettingURL(usersCorrectKey, starred)
+                        }
+                    }
+                }
+            })
+
+    }
+
+    afterGettingURL = async (key, primary, secondary) => {
+
+        //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
+
+        const {avatar, name, uid} = this.state
+
+        await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
+            avatar,
+            name,
+            uid,
+            'colors': {
+                primary,
+                secondary
+            }
+
+        }).then(() => {
+            this.addListeners(this.state.usersCorrectKey)
+            console.log(1)
+        })
+
+        this.closeModal()
+        console.log(
+            'colors added!'
+        )
+
+    }
+
+    //put
+
     starChannel = async () => {
         if(this.state.isChannelStarred){
             console.log('star')
 
 
 
-
-            // await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/starred/${[this.state.channel.id]}.json`,{
-            //     id: this.state.channel.id
-            // })
         }
 
         else {
-            // await axios.delete(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/starred/${this.state.channel.id}.json`)
                 console.log('unstar')
+
+
         }
     }
 
@@ -118,7 +194,6 @@ class Messages extends Component{
                 if(results){
                     const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
                     const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
-
                     this.setState({
                         messages: mess,
                         messagesLoading: false,
@@ -136,11 +211,10 @@ class Messages extends Component{
             })
     }
 
-    countUserPosts = messages => {
 
-        // messages.reduce((acc, message) =>{
-        //     console.log(message.user.name)
-        // }, [])
+
+
+    countUserPosts = messages => {
 
         let usersPosts = messages.reduce((acc, message) => {
 

@@ -29,10 +29,10 @@ class MetaPenal extends Component{
                 .map(([key, value], i) => {
                         console.log(value.avatar, value.count)
                         return (
-                            <List.Item key={i || 1}>
+                            <List.Item key={i}>
                                 <Image avatar src={value.avatar || 'no-avatar'}/>
                                 <List.Content>
-                                    <List.Header as='a'>{key || 1}</List.Header>
+                                    <List.Header as='a'>{key}</List.Header>
                                     <List.Description>{this.formatCount(value.count) || '0 posts'}</List.Description>
                                 </List.Content>
                             </List.Item>
