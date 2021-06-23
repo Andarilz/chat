@@ -1,13 +1,9 @@
 import React, {Component} from 'react'
 import { Header, Segment, Input, Icon } from 'semantic-ui-react'
+import {connect} from "react-redux";
 
 
 class MessagesHeader extends Component{
-
-    state = {
-    }
-
-    handleStar
 
     render(){
 
@@ -32,7 +28,8 @@ class MessagesHeader extends Component{
                                 name={isChannelStarred ? 'star' : 'star outline'}
                                 color={isChannelStarred ? 'yellow' : 'black'}
                             />
-                            )}
+                            )
+                        }
 
                     </span>
 
@@ -60,4 +57,10 @@ class MessagesHeader extends Component{
     }
 }
 
-export default MessagesHeader
+const mapStateToProps = state => {
+    return {
+        channel: state.channel
+    }
+}
+
+export default connect(mapStateToProps)(MessagesHeader)

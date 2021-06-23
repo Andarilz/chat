@@ -37,11 +37,9 @@ class ColorPenal extends Component{
             })
             .then(res => {
                 usersColors.unshift(res)
-                console.log(usersColors)
                 this.setState({
                     usersColors
                 })
-                console.log(usersColors)
             })
     }
 
@@ -87,6 +85,13 @@ class ColorPenal extends Component{
                                 name: this.state.userCorrectData.name,
                                 uid: this.state.userCorrectData.uid
                             })
+
+                            if(this.state.userCorrectData.starred){
+                                this.setState({
+                                    starred: this.state.userCorrectData.starred
+                                })
+                            }
+
                             this.afterGettingURL(usersCorrectKey, primary, secondary)
                         }
                     }
@@ -101,24 +106,50 @@ class ColorPenal extends Component{
 
         const {avatar, name, uid} = this.state
 
-       await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
-           avatar,
-           name,
-           uid,
-           'colors': {
-               primary,
-               secondary
-           }
+        if (this.state.userCorrectData.starred) {
+            const {starred} = this.state.userCorrectData
+
+            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
+                avatar,
+                name,
+                uid,
+                'colors': {
+                    primary,
+                    secondary
+                },
+                starred
+
+            }).then(() => {
+                this.addListeners(this.state.usersCorrectKey)
+                console.log(1)
+            })
+
+            this.closeModal()
+            console.log(
+                'colors added!'
+            )
+        } else {
+
+        await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`, {
+            avatar,
+            name,
+            uid,
+            'colors': {
+                primary,
+                secondary
+            }
 
         }).then(() => {
-           this.addListeners(this.state.usersCorrectKey)
-           console.log(1)
-       })
+            this.addListeners(this.state.usersCorrectKey)
+            console.log(1)
+        })
 
         this.closeModal()
         console.log(
             'colors added!'
         )
+
+    }
 
     }
 

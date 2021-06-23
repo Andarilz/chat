@@ -3,10 +3,8 @@ import {combineReducers} from "redux";
 import {
     SET_CURRENT_CHANNEL,
     SET_PRIVATE_CHANNEL,
-    MESS_COUNT,
-    MESS_ZERO,
     SET_USER_POSTS,
-    SET_COLORS
+    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR
 } from "../actions/types";
 
 const initialUserState = {
@@ -40,7 +38,8 @@ const user_reducer = (state = initialUserState, {payload, type}) => {
 const initialChannelState = {
     currentChannel: null,
     isPrivateChannel: false,
-    userPosts: null
+    userPosts: null,
+    starChannel: null
 }
 
 export const channel_reducers  = (state = initialChannelState, {type, payload}) => {
@@ -55,6 +54,12 @@ export const channel_reducers  = (state = initialChannelState, {type, payload}) 
         case SET_USER_POSTS:
 
             return {...state, userPosts: payload.userPosts}
+
+        case SET_STAR_CHANNEL:
+            return {...state, starChannel: payload.channel}
+
+        case SET_CANCEL_CHANNEL_STAR:
+            return {...state, starChannel: null}
 
 
         default: return state
@@ -79,13 +84,25 @@ export const colors_reducers = (state = colorInitialState, {type, payload}) => {
     }
 }
 
+export const userKey = (state = 0, {type, payload}) => {
+    switch(type){
+
+        case SET_KEY:
+
+            return payload
+
+        default: return state
+    }
+}
+
 
 
 
 const rootReducer = combineReducers({
     user: user_reducer,
     channel: channel_reducers,
-    colors: colors_reducers
+    colors: colors_reducers,
+    key: userKey
 })
 
 

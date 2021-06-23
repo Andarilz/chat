@@ -23,7 +23,7 @@ class SidePanel extends Component{
             }}
             >
                 <UserPanel currentUser={currentUser} primaryColor={primaryColor} />
-                <Starred />
+                <Starred currentUser={currentUser} />
                 <Channels  currentUser={currentUser} />
                 <DirectMessages currentUser={currentUser} />
             </Menu>

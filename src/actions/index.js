@@ -1,10 +1,10 @@
 import * as actionTypes from './types'
 import {
     MESS_COUNT,
-    MESS_ZERO,
+    MESS_ZERO, SET_CANCEL_CHANNEL_STAR,
     SET_COLORS,
-    SET_CURRENT_CHANNEL,
-    SET_PRIVATE_CHANNEL,
+    SET_CURRENT_CHANNEL, SET_KEY,
+    SET_PRIVATE_CHANNEL, SET_STAR_CHANNEL,
     SET_USER,
     SET_USER_POSTS
 } from "./types";
@@ -76,5 +76,29 @@ export const setColors = (primary, secondary) => {
             primary,
             secondary
         }
+    }
+}
+
+export const setKey = (key) => {
+    return {
+        type: SET_KEY,
+        payload: {
+            key
+        }
+    }
+}
+
+export const setStarChannel = (channel) => {
+    return {
+        type: SET_STAR_CHANNEL,
+        payload: {
+            channel
+        }
+    }
+}
+
+export const setCancelChannelStar = () => {
+    return {
+        type: SET_CANCEL_CHANNEL_STAR
     }
 }
