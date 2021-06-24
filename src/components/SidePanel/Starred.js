@@ -46,7 +46,6 @@ class Starred extends Component{
 
                     const usersCorrectKey = keysOfMessages[this.state.userCounter]
 
-                    console.log('correct key', usersCorrectKey)
 
                     this.setState({
                         key: usersCorrectKey
@@ -62,7 +61,6 @@ class Starred extends Component{
     addLastListener = async (key) => {
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}/starred.json`)
             .then(res => {
-                console.log(res)
                 return res.data
             })
             .then(result => {

@@ -27,7 +27,6 @@ class MetaPenal extends Component{
             return Object.entries(posts)
                 .sort((a, b) => b[1] - a[1])
                 .map(([key, value], i) => {
-                        console.log(value.avatar, value.count)
                         return (
                             <List.Item key={i}>
                                 <Image avatar src={value.avatar || 'no-avatar'}/>

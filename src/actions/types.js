@@ -19,3 +19,5 @@ export const SET_KEY = 'SET_KEY'
 export const SET_STAR_CHANNEL = 'STAR_CHANNEL'
 
 export const SET_CANCEL_CHANNEL_STAR = 'SET_CANСEL_CHANNEL_STAR'
+
+export const SET_USERS_COLORS = 'SET_USERS_COLORS'

@@ -6,7 +6,7 @@ import {
     SET_CURRENT_CHANNEL, SET_KEY,
     SET_PRIVATE_CHANNEL, SET_STAR_CHANNEL,
     SET_USER,
-    SET_USER_POSTS
+    SET_USER_POSTS, SET_USERS_COLORS
 } from "./types";
 
 //Users actions
@@ -100,5 +100,14 @@ export const setStarChannel = (channel) => {
 export const setCancelChannelStar = () => {
     return {
         type: SET_CANCEL_CHANNEL_STAR
+    }
+}
+
+export const setUsersColors = (usersColors) => {
+    return {
+        type: SET_USERS_COLORS,
+        payload: {
+            usersColors
+        }
     }
 }

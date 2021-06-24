@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Sidebar, Menu, Divider, Button, Modal, Icon, Label, Segment, PascalCase} from 'semantic-ui-react'
 import { SliderPicker } from 'react-color'
 import axios from "axios";
-import {setColors} from '../../actions'
+import {setColors, setUsersColors} from '../../actions'
 import {connect} from "react-redux";
 
 class ColorPenal extends Component{
@@ -20,13 +20,10 @@ class ColorPenal extends Component{
 
     componentDidMount() {
 
-        if(this.state.usersCorrectKey){
-            this.addListeners(this.state.usersCorrectKey)
-        }
-        if(this.state.primary && this.state.secondary){
-            this.addUsersListeners(this.state.primary, this.state.secondary)
-        }
+        this.Listeners()//получаем ключ
+            .then(() => this.addListeners(this.state.usersCorrectKey))//передаем ключ и получаем данные
     }
+
 
     addListeners = async userId => {
         let usersColors = []
@@ -40,6 +37,7 @@ class ColorPenal extends Component{
                 this.setState({
                     usersColors
                 })
+                this.props.setUsersColors(usersColors)
             })
     }
 
@@ -51,20 +49,19 @@ class ColorPenal extends Component{
 
     handleChangeSecondary = color => this.setState({secondary: color.hex})
 
-    addUsersListeners = async (primary, secondary) => { //делаем запрос к бд для получения данных
+    Listeners = async () => {
 
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
             .then(res => {
                 const results = res.data || []
 
-                if(results){
+                if (results) {
                     const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
 
                     const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
 
-
                     mess.map((el, i) => {
-                        if(el.uid === this.state.user.uid){
+                        if (el.uid === this.state.user.uid) {
                             this.setState({
                                 userCounter: i
                             })
@@ -73,31 +70,67 @@ class ColorPenal extends Component{
 
                     const usersCorrectKey = keysOfMessages[this.state.userCounter]
 
-                    if(usersCorrectKey){
+                    if (usersCorrectKey) {
                         this.setState({
-                            userCorrectData: results[usersCorrectKey],
+                            usersCorrectKey //id в firebase
+                        })
+                    }
+                }
+            })
+    }
+
+    addUsersListeners = async (primary, secondary) => { //делаем запрос к бд для получения данных
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+            .then(res => {
+                const results = res.data || []
+
+                if (results) {
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
+
+                    mess.map((el, i) => {
+                        if (el.uid === this.state.user.uid) {
+                            this.setState({
+                                userCounter: i
+                            })
+                        }
+                    })
+
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+
+                    if (usersCorrectKey) {
+                        this.setState({
                             usersCorrectKey //id в firebase
                         })
 
-                        if(this.state.userCorrectData && primary && secondary){
+                        if (usersCorrectKey) {
                             this.setState({
-                                avatar: this.state.userCorrectData.avatar,
-                                name: this.state.userCorrectData.name,
-                                uid: this.state.userCorrectData.uid
+                                userCorrectData: results[usersCorrectKey],
+                                usersCorrectKey //id в firebase
                             })
 
-                            if(this.state.userCorrectData.starred){
+                            if (this.state.userCorrectData && primary && secondary) {
                                 this.setState({
-                                    starred: this.state.userCorrectData.starred
+                                    avatar: this.state.userCorrectData.avatar,
+                                    name: this.state.userCorrectData.name,
+                                    uid: this.state.userCorrectData.uid
                                 })
-                            }
 
-                            this.afterGettingURL(usersCorrectKey, primary, secondary)
+                                if (this.state.userCorrectData.starred) {
+                                    this.setState({
+                                        starred: this.state.userCorrectData.starred
+                                    })
+                                }
+
+                                this.afterGettingURL(usersCorrectKey, primary, secondary)
+                            }
                         }
                     }
                 }
             })
-
     }
 
     afterGettingURL = async (key, primary, secondary) => {
@@ -141,7 +174,6 @@ class ColorPenal extends Component{
 
         }).then(() => {
             this.addListeners(this.state.usersCorrectKey)
-            console.log(1)
         })
 
         this.closeModal()
@@ -166,7 +198,6 @@ class ColorPenal extends Component{
     displayUserColors = colors => {
         if(colors.length){
            return colors.map((color, i )=> {
-
                return (
                    <React.Fragment key={i}>
                        <Divider />
@@ -242,4 +273,12 @@ class ColorPenal extends Component{
     }
 }
 
-export default connect(null, {setColors})(ColorPenal)
+const mapStateToProps = state => {
+    return {
+        primary: state.colors.primary,
+        secondary: state.colors.secondary,
+        usersColors: state.colors.usersColors
+    }
+}
+
+export default connect(mapStateToProps, {setColors, setUsersColors})(ColorPenal)

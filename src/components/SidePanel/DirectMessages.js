@@ -21,8 +21,6 @@ class DirectMessages extends Component{
         if(this.state.user){
             this.addListeners(this.state.user.uid)
         }
-
-        console.log(this.props.currentUser)
     }
 
      addListeners = async currentUserUid => {

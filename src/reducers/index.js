@@ -4,7 +4,7 @@ import {
     SET_CURRENT_CHANNEL,
     SET_PRIVATE_CHANNEL,
     SET_USER_POSTS,
-    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR
+    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR, SET_USERS_COLORS
 } from "../actions/types";
 
 const initialUserState = {
@@ -68,7 +68,8 @@ export const channel_reducers  = (state = initialChannelState, {type, payload}) 
 
 const colorInitialState = {
     primary: '#4c3c4c',
-    secondary: '#eee'
+    secondary: '#eee',
+    usersColors: []
 }
 
 export const colors_reducers = (state = colorInitialState, {type, payload}) => {
@@ -77,8 +78,15 @@ export const colors_reducers = (state = colorInitialState, {type, payload}) => {
 
             return {
                 primary: payload.primary,
-                secondary: payload.secondary
+                secondary: payload.secondary,
+                ...state
         }
+
+        case SET_USERS_COLORS:
+
+            return {
+                usersColors: payload.usersColors
+            }
 
         default: return state
     }
