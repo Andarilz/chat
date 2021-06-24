@@ -30,20 +30,61 @@ class Messages extends Component{
     }
 
     componentDidMount() {
+
         const {user, channel} = this.state
         if (channel && user) {
-            this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
-            this.addUserStarListener(channel.id, this.props.keyInf)
+            this.firstListeners()
+                .then(() => {
+                    this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
+                    this.addUserStarListener(channel.id, this.props.keyInf)
+                })
+
         }
     }
 
+    firstListeners = async () => { //делаем запрос к бд для получения данных
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+            .then(res => {
+                const results = res.data || []
+
+                if (results) {
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
+
+                    mess.map((el, i) => {
+                        if (el.uid === this.state.user.uid) {
+                            this.setState({
+                                userCounter: i
+                            })
+                        }
+                    })
+
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+
+                    console.log('key', usersCorrectKey)
+
+                    this.props.setKey(usersCorrectKey)
+
+                }
+            })
+    }
+
+
+
     addUserStarListener = async (channelId, userId) => {
+        console.log('работает1')
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/starred.json`)
             .then(result => {
+                console.log('работает2', result)
                 return result.data
             })
             .then(res => {
+                console.log('рес', res)
                 if(res){
+                    console.log('работает4')
                     const channelIds = Object.keys(res)
                     console.log([res[channelIds[0]]], 'данные для редакса')
                     this.props.setStarChannel([res[channelIds[0]]])
@@ -103,7 +144,11 @@ class Messages extends Component{
 
                     const usersCorrectKey = keysOfMessages[this.state.userCounter]
 
+                    console.log(this.props.keyInf,'инфа1')
+
                     this.props.setKey(usersCorrectKey)
+
+                    console.log(this.props.keyInf,'инфа2')
 
                     if(usersCorrectKey){
                         this.setState({

@@ -22,7 +22,10 @@ class ColorPenal extends Component{
 
         this.Listeners()//получаем ключ
             .then(() => this.addListeners(this.state.usersCorrectKey))//передаем ключ и получаем данные
+            .then(() => this.props.setColors(this.props.usersColors[0].primary, this.props.usersColors[0].secondary))
     }
+
+
 
 
     addListeners = async userId => {

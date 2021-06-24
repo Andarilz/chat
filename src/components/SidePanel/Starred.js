@@ -27,6 +27,8 @@ class Starred extends Component{
 
         //можно удалить весь блок, то же самое мы делали в цветах
 
+        console.log('starred')
+
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
             .then(res => {
                 const results = res.data || []
