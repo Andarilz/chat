@@ -1,18 +1,96 @@
 import React, {Component} from 'react'
 import { Grid, Header, Dropdown, Icon, Image, Modal, Input, Button } from "semantic-ui-react";
 import firebase from "../../Firebase/Firebase";
+import AvatarEditor from 'react-avatar-editor';
+import {connect} from "react-redux";
+import axios from "axios";
+import {setAvatar, setUser} from '../../actions';
+import {v4} from 'uuid'
+
+
 
 
 class UserPanel extends Component{
 
      state = {
-         user: '',
-         modal: false
+         user: this.props.user,
+         modal: false,
+         modalName: false,
+         previewImage: '',
+         croppedImage: '',
+         blob: '',
+         metadata: {
+             contentType: 'image/jpeg'
+         },
+         storageRef: firebase.storage().ref(),
+         uploadedCropperImage: '',
+         avatar: '',
+         userName: ''
      }
 
      componentDidMount() {
          this.setState({user: this.props.currentUser})
+
+         this.Listeners()//получаем ключ
+             .then(() => this.addListeners(this.state.usersCorrectKey))//передаем ключ и получаем данные
+
+         console.log()
      }
+
+    Listeners = async () => {
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+            .then(res => {
+                const results = res.data || []
+
+                if (results) {
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
+                    mess.map((el, i) => {
+                        if (el.uid === this.state.user.uid) {
+                            this.setState({
+                                userCounter: i
+                            })
+                        }
+                    })
+
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+
+                    if (usersCorrectKey) {
+                        this.setState({
+                            usersCorrectKey //id в firebase
+                        })
+                    }
+                }
+            })
+    }
+
+    addListeners = async userId => {
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json`)
+            .then(result => {
+                return result.data
+            })
+            .then(res => {
+                const inf = res.avatar
+                console.log(inf)
+
+                const name = res.name
+
+                this.setState({
+                    avatar: inf,
+                    name
+                })
+            })
+            .then(() => {
+                this.props.setUser({...this.props.user, photoURL: this.state.avatar, displayName: this.state.name})
+                this.setState({
+                    user: this.props.user
+                })
+            })
+    }
 
      dropdownOptions = () => [
         {
@@ -20,6 +98,10 @@ class UserPanel extends Component{
             text: (<span>Signed in as <strong>{this.state.user.displayName}</strong></span>),
             disabled: true
         },
+         {
+             key: 'name',
+             text: (<span onClick={this.openModalName}>Change Username</span>)
+         },
         {
             key: 'avatar',
             text: (<span onClick={this.openModal}>Change avatar</span>)
@@ -29,6 +111,10 @@ class UserPanel extends Component{
             text: (<span onClick={this.handleSignOut}>Sign Out</span>)
         }
     ]
+
+    openModalName = () => this.setState({modalName: true})
+
+    closeModalName = () => this.setState({modalName: false})
 
     openModal = () => this.setState({modal: true})
 
@@ -41,10 +127,266 @@ class UserPanel extends Component{
             .then(() => console.log('done!'))
     }
 
+    handleChange = event => {
+         const file = event.target.files[0]
+         const reader = new FileReader()
+
+        if(file){
+            reader.readAsDataURL(file)
+            reader.addEventListener('load', () => {
+                this.setState({
+                    previewImage: reader.result
+                })
+            })
+        }
+
+    }
+
+    handleCropImage = () => {
+         if(this.avatarEditor){
+             this.avatarEditor.getImageScaledToCanvas().toBlob(blob => {
+                 let imageURL = URL.createObjectURL(blob)
+                 this.setState({
+                     croppedImage: imageURL,
+                     blob
+                 })
+             })
+         }
+    }
+
+
+    uploadCroppedImage = () => {
+
+         const {storageRef, user, blob, metadata} = this.state
+
+        storageRef
+            .child(`avatars/user-${user.uid}-${v4()}`)
+            .put(blob, metadata)
+            .then(snap => {
+                snap.ref.getDownloadURL().then(URL => {
+                    this.setState({
+                        uploadedCropperImage: URL
+                    }, () => this.changeAvatar())
+                })
+            })
+    }
+
+
+
+
+    changeAvatar = async () => { //делаем запрос к бд для получения данных
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+            .then(res => {
+                const results = res.data || []
+
+                if (results) {
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
+
+                    mess.map((el, i) => {
+                        if (el.uid === this.state.user.uid) {
+                            this.setState({
+                                userCounter: i
+                            })
+                        }
+                    })
+
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+
+                    if (usersCorrectKey) {
+                        this.setState({
+                            usersCorrectKey //id в firebase
+                        })
+
+                        if (usersCorrectKey) {
+                            this.setState({
+                                userCorrectData: results[usersCorrectKey],
+                                usersCorrectKey //id в firebase
+                            })
+
+                            if (this.state.userCorrectData) {
+                                this.setState({
+                                    avatar: this.state.userCorrectData.avatar,
+                                    name: this.state.userCorrectData.name,
+                                    uid: this.state.userCorrectData.uid,
+                                    colors: this.state.userCorrectData.colors
+                                })
+
+                                if (this.state.userCorrectData.starred) {
+                                    this.setState({
+                                        starred: this.state.userCorrectData.starred
+                                    })
+                                }
+
+                                this.afterGettingURL(usersCorrectKey)
+                                this.setState({
+                                    user: {...this.state.user, photoURL: this.state.uploadedCropperImage}
+                                }, () => this.props.setUser(this.state.user))
+                                // this.props.setAvatar(this.state.uploadedCropperImage)
+
+                            }
+                        }
+                    }
+                }
+            })
+    }
+
+    afterGettingURL = async (key) => {
+
+        //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
+
+        const {avatar, name, uid, uploadedCropperImage, colors} = this.state
+
+        if (this.state.userCorrectData.starred) {
+            const {starred} = this.state.userCorrectData
+
+            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
+                avatar: uploadedCropperImage,
+                name,
+                uid,
+                colors,
+                starred
+
+            })
+
+            this.closeModal()
+            console.log(
+                'avatar changed!'
+            )
+        } else {
+
+            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`, {
+                avatar,
+                name,
+                uid,
+                colors
+
+            })
+
+            this.closeModal()
+            console.log(
+                'avatar changed!'
+            )
+        }
+    }
+
+
+    changeUserName = async () => { //делаем запрос к бд для получения данных
+
+        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+            .then(res => {
+                const results = res.data || []
+
+                if (results) {
+                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+
+                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+
+
+                    mess.map((el, i) => {
+                        if (el.uid === this.state.user.uid) {
+                            this.setState({
+                                userCounter: i
+                            })
+                        }
+                    })
+
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+
+                    if (usersCorrectKey) {
+                        this.setState({
+                            usersCorrectKey //id в firebase
+                        })
+
+                        if (usersCorrectKey) {
+                            this.setState({
+                                userCorrectData: results[usersCorrectKey],
+                                usersCorrectKey //id в firebase
+                            })
+
+                            if (this.state.userCorrectData) {
+                                this.setState({
+                                    avatar: this.state.userCorrectData.avatar,
+                                    name: this.state.userCorrectData.name,
+                                    uid: this.state.userCorrectData.uid,
+                                    colors: this.state.userCorrectData.colors
+                                })
+
+                                if (this.state.userCorrectData.starred) {
+                                    this.setState({
+                                        starred: this.state.userCorrectData.starred
+                                    })
+                                }
+
+                                this.afterGettingURLName(usersCorrectKey)
+                                this.setState({
+                                    user: {...this.state.user, displayName: this.state.userName}
+                                }, () => this.props.setUser(this.state.user))
+
+                            }
+                        }
+                    }
+                }
+            })
+    }
+
+    afterGettingURLName = async (key) => {
+
+        //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
+
+        const {avatar, uid, uploadedCropperImage, colors} = this.state
+
+        if (this.state.userCorrectData.starred) {
+            const {starred} = this.state.userCorrectData
+
+            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
+                avatar,
+                name: this.state.userName,
+                uid,
+                colors,
+                starred
+
+            })
+
+            this.closeModalName()
+            console.log(
+                'avatar changed!'
+            )
+        } else {
+
+            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`, {
+                avatar,
+                name: this.state.userName,
+                uid,
+                colors
+
+            })
+
+            this.closeModalName()
+            console.log(
+                'avatar changed!'
+            )
+        }
+    }
+
+    sendUsername = () => {
+        this.changeUserName()
+
+    }
+
+    addNewName = event => {
+        this.setState({
+            userName: event.target.value
+        })
+    }
+
 
     render(){
 
-         const {user, modal} = this.state
+         const {user, modal, previewImage, croppedImage} = this.state
 
         const {primaryColor} = this.props
 
@@ -95,16 +437,33 @@ class UserPanel extends Component{
                             type='file'
                             label='New Avatar'
                             name='preview Image'
+                            onChange={this.handleChange}
                             />
 
                             <Grid centered stackable columns={2}>
                                 <Grid.Row centered>
                                     <Grid.Column className='ui center aligned grid'>
-                                        {/*Image Preview*/}
+                                        {previewImage && (
+                                            <AvatarEditor
+                                                ref={node => this.avatarEditor = node}
+                                                image={previewImage}
+                                                width={120}
+                                                height={120}
+                                                border={50}
+                                                scale={1.2}
+                                            />
+                                        )}
                                     </Grid.Column>
 
                                     <Grid.Column>
-                                       {/*Cropped Image Preview*/}
+                                       {croppedImage && (
+                                           <Image
+                                               style={{margin: '3.5 em auto'}}
+                                               width={100}
+                                               height={100}
+                                               src={croppedImage}
+                                           />
+                                       )}
                                     </Grid.Column>
 
                                 </Grid.Row>
@@ -114,13 +473,14 @@ class UserPanel extends Component{
 
 
                         <Modal.Actions>
-                            <Button color='green' inverted>
 
-                                <Icon name='save' /> Change avatar
+                            {croppedImage && <Button color='green' inverted onClick={this.uploadCroppedImage}>
 
-                            </Button>
+                                <Icon name='save'/> Change avatar
 
-                            <Button color='green' inverted>
+                            </Button>}
+
+                            <Button color='green' inverted onClick={this.handleCropImage}>
 
                                 <Icon name='image' /> Preview
 
@@ -134,6 +494,36 @@ class UserPanel extends Component{
                         </Modal.Actions>
 
                     </Modal>
+
+                    <Modal basic open={this.state.modalName} onClose={this.closeModalName}>
+
+                        <Modal.Header>
+                            Select a new Username
+                        </Modal.Header>
+
+                        <Modal.Content>
+
+                            <Input
+                                fluid
+                                label='Username'
+                                name='userName'
+                                type='text'
+                                onChange={this.addNewName}
+                                // disabled={!!this.state.linkFile}
+                            />
+
+                        </Modal.Content>
+
+                        <Modal.Actions>
+
+                            <Button onClick={this.sendUsername} color='green' inverted><Icon name='checkmark'/> Send</Button>
+
+                            <Button color='red' inverted onClick={this.closeModalName}><Icon name='remove'/> Cancel</Button>
+
+                        </Modal.Actions>
+
+                    </Modal>
+
                 </Grid.Column>
             </Grid>
         )
@@ -141,6 +531,12 @@ class UserPanel extends Component{
 }
 
 
+const mapStateToProps = state => {
+    return {
+        user: state.user.currentUser
+    }
+}
 
-export default UserPanel
+
+export default connect(mapStateToProps, {setUser, setAvatar})(UserPanel)
 

@@ -43,10 +43,16 @@ class MessageForm extends Component{
         const message = {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             user: {
-                id: this.state.user.uid,
-                name: this.state.user.displayName,
-                avatar: this.state.user.photoURL,
+                // id: this.state.user.uid,
+                // name: this.state.user.displayName,
+                // avatar: this.state.user.photoURL,
+                // errors: []
+
+                id: this.props.user.uid,
+                name: this.props.user.displayName,
+                avatar: this.props.user.photoURL,
                 errors: []
+
             },
         }
 
@@ -245,7 +251,8 @@ class MessageForm extends Component{
 
 const mapStateToProps = state => {
     return {
-        counter: state.counter
+        counter: state.counter,
+        user: state.user.currentUser
     }
 }
 

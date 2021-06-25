@@ -20,13 +20,25 @@ const store = createStore(rootReducer, composeWithDevTools())
 
 class Root extends React.Component {
 
+    state = {
+        user: {}
+    }
+
     componentDidMount() {
 
          firebase.auth().onAuthStateChanged(user => { //проверка входа
             if(user){ //был вход
                 // this.props.history.push('/') //редирект при регистрации
-                this.props.setUser(user)
-                console.log(user)
+                        this.props.setUser(user)
+                        console.log(user)
+                // if(this.props.avatar){
+                //     this.setState({
+                //         user: {...this.props.currentUser, photoURL: this.props.avatar}
+                //     }, () => this.props.setUser(this.state.user))
+                // } else {
+                //             this.props.setUser(user)
+                //
+                // }
                 }
 
             else {
@@ -49,7 +61,9 @@ class Root extends React.Component {
 
 const mapStateToProps = state => {
     return {
-        isLoading: state.user.isLoading
+        isLoading: state.user.isLoading,
+        currentUser: state.user.currentUser,
+        avatar: state.avatar.avatar
     }
 }
 

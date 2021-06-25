@@ -1,7 +1,7 @@
 import * as actionTypes from './types'
 import {
     MESS_COUNT,
-    MESS_ZERO, SET_CANCEL_CHANNEL_STAR,
+    MESS_ZERO, SET_AVATAR, SET_CANCEL_CHANNEL_STAR,
     SET_COLORS,
     SET_CURRENT_CHANNEL, SET_KEY,
     SET_PRIVATE_CHANNEL, SET_STAR_CHANNEL,
@@ -108,6 +108,15 @@ export const setUsersColors = (usersColors) => {
         type: SET_USERS_COLORS,
         payload: {
             usersColors
+        }
+    }
+}
+
+export const setAvatar = (avatarURL) => {
+    return {
+        type: SET_AVATAR,
+        payload: {
+            avatarURL
         }
     }
 }

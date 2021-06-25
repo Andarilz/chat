@@ -4,7 +4,7 @@ import {
     SET_CURRENT_CHANNEL,
     SET_PRIVATE_CHANNEL,
     SET_USER_POSTS,
-    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR, SET_USERS_COLORS
+    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR, SET_USERS_COLORS, SET_AVATAR
 } from "../actions/types";
 
 const initialUserState = {
@@ -103,6 +103,19 @@ export const userKey = (state = 0, {type, payload}) => {
     }
 }
 
+export const avatar = (state = '', {payload, type}) => {
+    switch(type){
+
+        case SET_AVATAR:
+
+            return {
+                avatar: payload.avatarURL
+            }
+
+        default: return state
+    }
+}
+
 
 
 
@@ -110,7 +123,8 @@ const rootReducer = combineReducers({
     user: user_reducer,
     channel: channel_reducers,
     colors: colors_reducers,
-    key: userKey
+    key: userKey,
+    avatar
 })
 
 
