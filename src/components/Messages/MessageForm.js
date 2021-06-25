@@ -88,7 +88,6 @@ class MessageForm extends Component{
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
                     this.props.counterUp()
-                    console.log(this.props.counter, 'counter')
                 })
                 .catch(e => {
                     console.error(e)

@@ -75,18 +75,13 @@ class Messages extends Component{
 
 
     addUserStarListener = async (channelId, userId) => {
-        console.log('работает1')
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/starred.json`)
             .then(result => {
-                console.log('работает2', result)
                 return result.data
             })
             .then(res => {
-                console.log('рес', res)
                 if(res){
-                    console.log('работает4')
                     const channelIds = Object.keys(res)
-                    console.log([res[channelIds[0]]], 'данные для редакса')
                     this.props.setStarChannel([res[channelIds[0]]])
                     const prevStarred = channelIds.includes(channelId)
                     this.setState({

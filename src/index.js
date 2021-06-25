@@ -13,6 +13,7 @@ import {composeWithDevTools} from 'redux-devtools-extension';
 import rootReducer from './reducers';
 import {clearUser, setUser} from "./actions";
 import Spinner from "./components/Spinner";
+import axios from "axios";
 
 const store = createStore(rootReducer, composeWithDevTools())
 
@@ -21,12 +22,13 @@ class Root extends React.Component {
 
     componentDidMount() {
 
-        firebase.auth().onAuthStateChanged(user => { //проверка входа
-            console.log('user', user)
+         firebase.auth().onAuthStateChanged(user => { //проверка входа
             if(user){ //был вход
-                this.props.setUser(user) //передаем в редакс значение по пользователю вошедшему
                 // this.props.history.push('/') //редирект при регистрации
-            }
+                this.props.setUser(user)
+                console.log(user)
+                }
+
             else {
                 // this.props.history.push('/login') //редирект без регистрации
                 this.props.clearUser()

@@ -75,45 +75,13 @@ export default class Register extends Component{
          await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`, {
              name: createdUser.user.displayName,
              avatar: createdUser.user.photoURL,
-             uid: createdUser.user.uid
+             uid: createdUser.user.uid,
+             primary: {
+                 primary: '#eee',
+                 secondary: "#4c3c4c"
+             }
         })
 
-        console.log({
-            name: createdUser.user.displayName,
-            avatar: createdUser.user.photoURL,
-            uid: createdUser.user.uid
-        })
-
-        // await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`, {
-        //     [createdUser.user.uid]: {
-        //         name: createdUser.user.displayName,
-        //         avatar: createdUser.user.photoURL,
-        //         uid: createdUser.user.uid
-        //     }
-        // })
-
-
-        // https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${this.state.user.uid}
-
-        //поменять значения, delete для удаления значения
-        // await axios.patch('https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json', {
-        //     name: 'changed name',
-        //     avatar: 'avatar Roku'
-        // })
-
-            // return firebase.database().ref('inf').set({
-            //     information: 'res'
-            // })
-
-        // firebase.database().ref('inf').set({
-        //     like: '5'
-        // }).then(success => {
-        //         console.log('success', success);
-        //     },
-        //     error => {
-        //         console.log('error',error);
-        //     }
-        // );
     }
 
     handleSubmit = event => { // проверка на валидацию, отмена стандартного поведения формы, загрузка данных в регистрацию фаербэйз
