@@ -33,10 +33,23 @@ class MessageForm extends Component{
         this.setState({[event.target.name]: event.target.value}) //внесение значений из инпута
     }
 
-    enterClick = event => { //чтоб по энтеру отсылать смс
+    enterClick = async (event) => { //чтоб по энтеру отсылать смс
+
+        const {message, channel, user} = this.state
+
         if(event.keyCode === 13 && this.state.message){
             this.sendMessage()
         }
+
+        // if(message){
+        //
+        //     await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/typing/${channel.id}.json`, {
+        //          [user.uid]: user.displayName
+        //     })
+        //
+        // } else {
+        //     await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/typing/${channel.id}.json`,{})
+        // }
     }
 
     createMessage = (fileURL = null, linkImage= null) => { //формируем объект для отправки на сервер

@@ -28,21 +28,14 @@ class Root extends React.Component {
 
          firebase.auth().onAuthStateChanged(user => { //проверка входа
             if(user){ //был вход
-                // this.props.history.push('/') //редирект при регистрации
-                        this.props.setUser(user)
-                        console.log(user)
-                // if(this.props.avatar){
-                //     this.setState({
-                //         user: {...this.props.currentUser, photoURL: this.props.avatar}
-                //     }, () => this.props.setUser(this.state.user))
-                // } else {
-                //             this.props.setUser(user)
-                //
-                // }
-                }
+                this.props.setUser(user)
+                setTimeout(() => {
+                    this.props.history.push('/') //редирект при регистрации
+                },1000)
+            }
 
             else {
-                // this.props.history.push('/login') //редирект без регистрации
+                this.props.history.push('/login') //редирект без регистрации
                 this.props.clearUser()
             }
         })

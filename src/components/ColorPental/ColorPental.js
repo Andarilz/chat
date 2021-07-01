@@ -205,8 +205,8 @@ class ColorPenal extends Component{
                    <React.Fragment key={i}>
                        <Divider />
                        <div className="color__container" onClick={() => this.props.setColors(color.primary, color.secondary)}>
-                           <div className="color__square" style={{background: color.primary}}>
-                               <div className="color__overlay" style={{background: color.secondary}}></div>
+                           <div className="color__square" style={{background: color.primary || 'black'}}>
+                               <div className="color__overlay" style={{background: color.secondary || 'white'}}></div>
                            </div>
                        </div>
                    </React.Fragment>

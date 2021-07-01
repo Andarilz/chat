@@ -76,15 +76,18 @@ class UserPanel extends Component{
                 return result.data
             })
             .then(res => {
-                const inf = res.avatar
-                console.log(inf)
 
-                const name = res.name
+                if(res){
+                    const inf = res.avatar
 
-                this.setState({
-                    avatar: inf,
-                    name
-                })
+                    const name = res.name
+
+                    this.setState({
+                        avatar: inf || 'https://www.google.ru/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png',
+                        name
+                    })
+                }
+
             })
             .then(() => {
                 this.props.setUser({...this.props.user, photoURL: this.state.avatar, displayName: this.state.name})
