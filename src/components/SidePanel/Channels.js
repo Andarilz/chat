@@ -142,7 +142,8 @@ class Channels extends Component{
             details: channelDetails,
             createdBy: {
                 name: user.displayName,
-                avatar: user.photoURL
+                avatar: user.photoURL,
+                uid: user.uid
             }
         })
             .then(() => {

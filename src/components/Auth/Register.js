@@ -76,7 +76,7 @@ export default class Register extends Component{
              name: createdUser.user.displayName,
              avatar: createdUser.user.photoURL,
              uid: createdUser.user.uid,
-             primary: {
+             colors: {
                  primary: '#eee',
                  secondary: "#4c3c4c"
              }

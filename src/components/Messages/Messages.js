@@ -7,6 +7,8 @@ import axios from 'axios'
 import Message from "./Message";
 import {connect} from "react-redux";
 import {setKey, setStarChannel, setUserPosts, setCancelChannelStar} from "../../actions";
+import $ from 'jquery'
+
 
 
 class Messages extends Component{
@@ -26,8 +28,13 @@ class Messages extends Component{
         PrivateChannel: this.props.isPrivateChannel,
         isChannelStarred: false,
         usersCorrectKey: '',
-        idOfStarredChannel: ''
-    }
+        idOfStarredChannel: '',
+        userCorrectData: '',
+        avatar: '',
+        name: '',
+        uid: ''}
+
+
 
     componentDidMount() {
 
@@ -36,11 +43,14 @@ class Messages extends Component{
             this.firstListeners()
                 .then(() => {
                     this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
-                    this.addUserStarListener(channel.id, this.props.keyInf)
+                    this.addUserStarListener(channel.id, this.props.keyInf) //обрабатываем звезду
+                    // this.addUsersListeners() //получаем данные пользователей
                 })
 
         }
     }
+
+
 
     firstListeners = async () => { //делаем запрос к бд для получения данных
 
@@ -64,26 +74,22 @@ class Messages extends Component{
 
                     const usersCorrectKey = keysOfMessages[this.state.userCounter]
 
-                    console.log('key', usersCorrectKey)
-
                     this.props.setKey(usersCorrectKey)
 
                 }
             })
     }
 
-
-
     addUserStarListener = async (channelId, userId) => {
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}/starred.json`)
             .then(result => {
-                return result.data
+                return result.data //получаем всю информацию из starred-каналов
             })
             .then(res => {
                 if(res){
-                    const channelIds = Object.keys(res)
-                    this.props.setStarChannel([res[channelIds[0]]])
-                    const prevStarred = channelIds.includes(channelId)
+                    const channelIds = Object.keys(res) //берем все ключи
+                    this.props.setStarChannel([res[channelIds[0]]]) //добавляем звездный канал в БД
+                    const prevStarred = channelIds.includes(channelId) //проверяем, есть ли в текущем канале звездный
                     this.setState({
                         isChannelStarred: prevStarred
                     })
@@ -107,7 +113,7 @@ class Messages extends Component{
         }, () => this.handleSearchMessages()) //запускаем метод поиска
     }
 
-    handleStar = () => {
+    handleStar = () => { //переключаем звезду
 
         this.setState({
             isChannelStarred: !this.state.isChannelStarred
@@ -121,7 +127,7 @@ class Messages extends Component{
 
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
             .then(res => {
-                const results = res.data || []
+                const results = res.data || [] //получаем всю инфу о юзерах
 
                 if(results){
                     const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
@@ -132,39 +138,37 @@ class Messages extends Component{
                     mess.map((el, i) => {
                         if(el.uid === this.state.user.uid){
                             this.setState({
-                                userCounter: i
+                                userCounter: i //находим ключ с нужным пользователем
                             })
                         }
                     })
 
-                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
+                    const usersCorrectKey = keysOfMessages[this.state.userCounter] //назодим ключя из БД
 
-                    console.log(this.props.keyInf,'инфа1')
 
-                    this.props.setKey(usersCorrectKey)
+                    this.props.setKey(usersCorrectKey) //добавляем ключ в пропсы
 
-                    console.log(this.props.keyInf,'инфа2')
 
-                    if(usersCorrectKey){
+                    if(usersCorrectKey){ //если ли ключ
                         this.setState({
                             userCorrectData: results[usersCorrectKey],
                             usersCorrectKey //id в firebase
                         })
 
-                        if(this.state.userCorrectData){
+                        if(this.state.userCorrectData){ //получили ли дату из БД
                             this.setState({
                                 avatar: this.state.userCorrectData.avatar,
                                 name: this.state.userCorrectData.name,
                                 uid: this.state.userCorrectData.uid,
                             })
 
-                            if(this.state.userCorrectData.colors){
+                            if(this.state.userCorrectData.colors){ //есть ли цвета
                                 this.setState({
                                     colors: this.state.userCorrectData.colors
                                 })
                             }
 
-                            if(toggle){
+                            if(toggle){ //если ли starred
                                 this.afterGettingURLTRUE(usersCorrectKey, [this.state.starred])
                             } else {
                                 this.afterGettingURLFALSE(usersCorrectKey)
@@ -177,33 +181,13 @@ class Messages extends Component{
 
     }
 
-    afterGettingURLTRUE = async (key) => {
+    afterGettingURLTRUE = async (key) => { //если есть звезда в каналах
 
         //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
 
         const {avatar, name, uid, colors} = this.state
 
-        // const resKey = Object.keys(this.state.starred)
-        //
-        // const starred = resKey.map(key => {
-        //    return {
-        //        [this.state.starred[key].id]: {
-        //            name: this.state.starred[key].name,
-        //            details: this.state.starred[key].details,
-        //            id: this.state.starred[key].id,
-        //            createdBy: {
-        //                name: this.state.starred[key].createdBy.name,
-        //                avatar: this.state.starred[key].createdBy.avatar
-        //            }
-        //        }
-        //    }
-        // })
-        //
-        // starred.push({[this.state.channel.id]: this.state.channel})
-        //
-        // console.log('inf', starred)
-
-        // console.log('inf', this.state.starred[resKey].id)
+        console.log(111111)
 
         await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
             avatar,
@@ -235,7 +219,7 @@ class Messages extends Component{
 
     }
 
-    afterGettingURLFALSE = async (key) => {
+    afterGettingURLFALSE = async (key) => { //если нет звезды в каналах
 
         //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
 
@@ -255,8 +239,8 @@ class Messages extends Component{
 
     //put
 
-    starChannel = async () => {
-        if(this.state.isChannelStarred){
+    starChannel = async () => { //канал со звездочкой
+        if(this.state.isChannelStarred){ //добавляем звезду
             console.log('star')
            await this.addUsersListeners(true)
                .then(() => {
@@ -266,7 +250,7 @@ class Messages extends Component{
         else {
             await this.addUsersListeners(false)
                 this.props.setCancelChannelStar()
-                console.log('unstar')
+                console.log('unstar') //убираем звезду
         }
     }
 
@@ -321,6 +305,7 @@ class Messages extends Component{
 
                     this.countUniqUsers(mess)
                     this.countUserPosts(mess)
+                    console.log(mess)
                 }else{
                     this.setState({
                         messages: '',
@@ -331,9 +316,7 @@ class Messages extends Component{
     }
 
 
-
-
-    countUserPosts = messages => {
+    countUserPosts = messages => { //получаем все почты и сортируем их для вывода в мета-панели справа
 
         let usersPosts = messages.reduce((acc, message) => {
 
@@ -341,10 +324,13 @@ class Messages extends Component{
                 acc[message.user.name].count += 1
             } else {
                 acc[message.user.name] = {
-                    avatar: message.user.avatar,
-                    count: 1
+                    avatar: message.user.id === this.state.user.uid ? this.props.currentUser.photoURL : message.user.avatar,
+                    count: 1,
+                    uid: message.user.id,
+                    name: message.user.name
+                    }
                 }
-            }
+
 
             return acc
 
@@ -372,7 +358,7 @@ class Messages extends Component{
         })
     }
 
-    displayMessages = messages => {
+    displayMessages = messages => { //отображаем сообщения
        return messages.length > 0 && messages.map(message => (
                 <Message
                 key={message.timestamp}
@@ -392,7 +378,7 @@ class Messages extends Component{
     }
 
     displayChannelName = channel => {
-        return channel && `${this.state.PrivateChannel ? '@' : '#'}${channel.name}`
+        return channel && `${this.state.PrivateChannel ? '@' : '#'}${channel.name}` //выводим имя канала
     }
 
     render(){
@@ -438,7 +424,8 @@ class Messages extends Component{
 
 const mapStateToProps = state => {
     return {
-        keyInf: state.key.key
+        keyInf: state.key.key,
+        currentUser: state.user.currentUser
     }
 }
 

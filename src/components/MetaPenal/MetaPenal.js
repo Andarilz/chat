@@ -24,21 +24,24 @@ class MetaPenal extends Component{
 
     displayTopPosters = posts => {
 
+
             return Object.entries(posts)
+
                 .sort((a, b) => b[1] - a[1])
                 .map(([key, value], i) => {
                         return (
                             <List.Item key={i}>
                                 <Image avatar src={value.avatar || 'no-avatar'}/>
                                 <List.Content>
-                                    <List.Header as='a'>{key}</List.Header>
+                                    <List.Header as='a'>{value.name}</List.Header>
                                     <List.Description>{this.formatCount(value.count) || '0 posts'}</List.Description>
                                 </List.Content>
                             </List.Item>
                         )
                     }
                 )
-                // .slice(0, 5)
+                .slice(0, 5)
+
         }
 
 
@@ -105,7 +108,7 @@ class MetaPenal extends Component{
                     <Accordion.Content active={activeIndex === 2}>
 
                         <Header>
-                            <Image circular src={channel && channel.createdBy.avatar} />
+                            {/*<Image circular src={channel.createdBy.avatar} />*/}
                             {channel && channel.createdBy.name}
                         </Header>
 
@@ -120,7 +123,8 @@ class MetaPenal extends Component{
 
 const mapStateToProps = state => {
     return {
-        userPosts: state.channel.userPosts
+        userPosts: state.channel.userPosts,
+        user: state.user.currentUser
     }
 }
 

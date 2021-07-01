@@ -27,8 +27,6 @@ class Starred extends Component{
 
         //можно удалить весь блок, то же самое мы делали в цветах
 
-        console.log('starred')
-
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
             .then(res => {
                 const results = res.data || []
@@ -39,10 +37,12 @@ class Starred extends Component{
                     const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
 
                     mess.map((el, i) => {
-                        if (el.uid === this.state.user.uid) {
+                        if (this.state.user && el.uid === this.state.user.uid) {
                             this.setState({
                                 userCounter: i
                             })
+                        } else {
+                            return true
                         }
                     })
 

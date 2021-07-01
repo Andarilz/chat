@@ -1,13 +1,11 @@
 import React, {Component} from 'react'
-import { Grid, Header, Dropdown, Icon, Image, Modal, Input, Button } from "semantic-ui-react";
+import {Grid, Header, Dropdown, Icon, Image, Modal, Input, Button, Loader, Dimmer, Segment} from "semantic-ui-react";
 import firebase from "../../Firebase/Firebase";
 import AvatarEditor from 'react-avatar-editor';
 import {connect} from "react-redux";
 import axios from "axios";
-import {setAvatar, setUser} from '../../actions';
+import {setAvatar, setCurrentChannel, setUser, setUserPostsAvatar} from '../../actions';
 import {v4} from 'uuid'
-
-
 
 
 class UserPanel extends Component{
@@ -25,47 +23,51 @@ class UserPanel extends Component{
          storageRef: firebase.storage().ref(),
          uploadedCropperImage: '',
          avatar: '',
-         userName: ''
+         userName: '',
+         loading: false
      }
 
      componentDidMount() {
-         this.setState({user: this.props.currentUser})
-
-         this.Listeners()//получаем ключ
-             .then(() => this.addListeners(this.state.usersCorrectKey))//передаем ключ и получаем данные
-
-         console.log()
+         this.onStart()
      }
 
-    Listeners = async () => {
+     onStart = () => {
+         this.setState({user: this.props.currentUser, loading: true})
+         this.getUserFetchData()//получаем ключ, раньше тут был листенерс
+             .then(() => this.addListeners(this.state.usersCorrectKey))//передаем ключ и получаем данные
+             .then(() => this.setState({loading: false}))
+     }
 
-        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
-            .then(res => {
-                const results = res.data || []
 
-                if (results) {
-                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
-
-                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
-
-                    mess.map((el, i) => {
-                        if (el.uid === this.state.user.uid) {
-                            this.setState({
-                                userCounter: i
-                            })
-                        }
-                    })
-
-                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
-
-                    if (usersCorrectKey) {
-                        this.setState({
-                            usersCorrectKey //id в firebase
-                        })
-                    }
-                }
-            })
-    }
+    // Listeners = async () => {
+    //
+    //     await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+    //         .then(res => {
+    //             const results = res.data || []
+    //
+    //             if (results) {
+    //                 const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+    //
+    //                 const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+    //
+    //                 mess.map((el, i) => {
+    //                     if (el.uid === this.state.user.uid) {
+    //                         this.setState({
+    //                             userCounter: i
+    //                         })
+    //                     }
+    //                 })
+    //
+    //                 const usersCorrectKey = keysOfMessages[this.state.userCounter]
+    //
+    //                 if (usersCorrectKey) {
+    //                     this.setState({
+    //                         usersCorrectKey //id в firebase
+    //                     })
+    //                 }
+    //             }
+    //         })
+    // }
 
     addListeners = async userId => {
 
@@ -95,13 +97,13 @@ class UserPanel extends Component{
      dropdownOptions = () => [
         {
             key: 'user',
-            text: (<span>Signed in as <strong>{this.state.user.displayName}</strong></span>),
+            text: (<span>Signed in as <strong>{this.state.user && this.state.user.displayName}</strong></span>),
             disabled: true
         },
-         {
-             key: 'name',
-             text: (<span onClick={this.openModalName}>Change Username</span>)
-         },
+         // {
+         //     key: 'name',
+         //     text: (<span onClick={this.openModalName}>Change Username</span>)
+         // },
         {
             key: 'avatar',
             text: (<span onClick={this.openModal}>Change avatar</span>)
@@ -111,10 +113,6 @@ class UserPanel extends Component{
             text: (<span onClick={this.handleSignOut}>Sign Out</span>)
         }
     ]
-
-    openModalName = () => this.setState({modalName: true})
-
-    closeModalName = () => this.setState({modalName: false})
 
     openModal = () => this.setState({modal: true})
 
@@ -154,7 +152,6 @@ class UserPanel extends Component{
          }
     }
 
-
     uploadCroppedImage = () => {
 
          const {storageRef, user, blob, metadata} = this.state
@@ -171,10 +168,56 @@ class UserPanel extends Component{
             })
     }
 
+    changeAvatar = async () => {
 
+        if (this.state.userCorrectData) {
+            this.setState({
+                avatar: this.state.userCorrectData.avatar,
+                name: this.state.userCorrectData.name,
+                uid: this.state.userCorrectData.uid,
+                colors: this.state.userCorrectData.colors
+            })
 
+            if (this.state.userCorrectData.starred) {
+                this.setState({
+                    starred: this.state.userCorrectData.starred
+                })
+            }
 
-    changeAvatar = async () => { //делаем запрос к бд для получения данных
+        }
+
+         this.getUserFetchData()
+             .then(() => {
+                 if (this.state.userCorrectData) {
+                     this.setState({
+                         avatar: this.state.userCorrectData.avatar,
+                         name: this.state.userCorrectData.name,
+                         uid: this.state.userCorrectData.uid,
+                         colors: this.state.userCorrectData.colors
+                     })
+
+                     if (this.state.userCorrectData.starred) {
+                         this.setState({
+                             starred: this.state.userCorrectData.starred
+                         })
+                     }
+
+                     this.afterGettingURL(this.state.usersCorrectKey)
+
+                     this.setState({
+                         user: {...this.state.user, photoURL: this.state.uploadedCropperImage}
+                     }, () => {
+                         this.props.setUser(this.state.user)
+
+                     })
+
+                 }
+
+             })
+
+    }
+
+    getUserFetchData = async () => { //делаем запрос к бд для получения данных
 
         await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
             .then(res => {
@@ -207,38 +250,77 @@ class UserPanel extends Component{
                                 usersCorrectKey //id в firebase
                             })
 
-                            if (this.state.userCorrectData) {
-                                this.setState({
-                                    avatar: this.state.userCorrectData.avatar,
-                                    name: this.state.userCorrectData.name,
-                                    uid: this.state.userCorrectData.uid,
-                                    colors: this.state.userCorrectData.colors
-                                })
-
-                                if (this.state.userCorrectData.starred) {
-                                    this.setState({
-                                        starred: this.state.userCorrectData.starred
-                                    })
-                                }
-
-                                this.afterGettingURL(usersCorrectKey)
-                                this.setState({
-                                    user: {...this.state.user, photoURL: this.state.uploadedCropperImage}
-                                }, () => this.props.setUser(this.state.user))
-                                // this.props.setAvatar(this.state.uploadedCropperImage)
-
-                            }
                         }
                     }
                 }
             })
     }
 
+    // changeAvatar = async () => { //делаем запрос к бд для получения данных
+    //
+    //     await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
+    //         .then(res => {
+    //             const results = res.data || []
+    //
+    //             if (results) {
+    //                 const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
+    //
+    //                 const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
+    //
+    //
+    //                 mess.map((el, i) => {
+    //                     if (el.uid === this.state.user.uid) {
+    //                         this.setState({
+    //                             userCounter: i
+    //                         })
+    //                     }
+    //                 })
+    //
+    //                 const usersCorrectKey = keysOfMessages[this.state.userCounter]
+    //
+    //                 if (usersCorrectKey) {
+    //                     this.setState({
+    //                         usersCorrectKey //id в firebase
+    //                     })
+    //
+    //                     if (usersCorrectKey) {
+    //                         this.setState({
+    //                             userCorrectData: results[usersCorrectKey],
+    //                             usersCorrectKey //id в firebase
+    //                         })
+    //
+    //                         if (this.state.userCorrectData) {
+    //                             this.setState({
+    //                                 avatar: this.state.userCorrectData.avatar,
+    //                                 name: this.state.userCorrectData.name,
+    //                                 uid: this.state.userCorrectData.uid,
+    //                                 colors: this.state.userCorrectData.colors
+    //                             })
+    //
+    //                             if (this.state.userCorrectData.starred) {
+    //                                 this.setState({
+    //                                     starred: this.state.userCorrectData.starred
+    //                                 })
+    //                             }
+    //
+    //                             this.afterGettingURL(usersCorrectKey)
+    //                             this.setState({
+    //                                 user: {...this.state.user, photoURL: this.state.uploadedCropperImage}
+    //                             }, () => this.props.setUser(this.state.user))
+    //                             // this.props.setAvatar(this.state.uploadedCropperImage)
+    //
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         })
+    // }
+
     afterGettingURL = async (key) => {
 
         //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
 
-        const {avatar, name, uid, uploadedCropperImage, colors} = this.state
+        const {name, uid, uploadedCropperImage, colors} = this.state
 
         if (this.state.userCorrectData.starred) {
             const {starred} = this.state.userCorrectData
@@ -249,7 +331,6 @@ class UserPanel extends Component{
                 uid,
                 colors,
                 starred
-
             })
 
             this.closeModal()
@@ -259,11 +340,10 @@ class UserPanel extends Component{
         } else {
 
             await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`, {
-                avatar,
+                avatar: uploadedCropperImage,
                 name,
                 uid,
                 colors
-
             })
 
             this.closeModal()
@@ -271,122 +351,12 @@ class UserPanel extends Component{
                 'avatar changed!'
             )
         }
-    }
-
-
-    changeUserName = async () => { //делаем запрос к бд для получения данных
-
-        await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`)
-            .then(res => {
-                const results = res.data || []
-
-                if (results) {
-                    const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
-
-                    const mess = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив данных из объекта с ключами
-
-
-                    mess.map((el, i) => {
-                        if (el.uid === this.state.user.uid) {
-                            this.setState({
-                                userCounter: i
-                            })
-                        }
-                    })
-
-                    const usersCorrectKey = keysOfMessages[this.state.userCounter]
-
-                    if (usersCorrectKey) {
-                        this.setState({
-                            usersCorrectKey //id в firebase
-                        })
-
-                        if (usersCorrectKey) {
-                            this.setState({
-                                userCorrectData: results[usersCorrectKey],
-                                usersCorrectKey //id в firebase
-                            })
-
-                            if (this.state.userCorrectData) {
-                                this.setState({
-                                    avatar: this.state.userCorrectData.avatar,
-                                    name: this.state.userCorrectData.name,
-                                    uid: this.state.userCorrectData.uid,
-                                    colors: this.state.userCorrectData.colors
-                                })
-
-                                if (this.state.userCorrectData.starred) {
-                                    this.setState({
-                                        starred: this.state.userCorrectData.starred
-                                    })
-                                }
-
-                                this.afterGettingURLName(usersCorrectKey)
-                                this.setState({
-                                    user: {...this.state.user, displayName: this.state.userName}
-                                }, () => this.props.setUser(this.state.user))
-
-                            }
-                        }
-                    }
-                }
-            })
-    }
-
-    afterGettingURLName = async (key) => {
-
-        //алгоритм позволяет вносить изменения в базу данных юзера, надо сохранить uid в новом поле
-
-        const {avatar, uid, uploadedCropperImage, colors} = this.state
-
-        if (this.state.userCorrectData.starred) {
-            const {starred} = this.state.userCorrectData
-
-            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
-                avatar,
-                name: this.state.userName,
-                uid,
-                colors,
-                starred
-
-            })
-
-            this.closeModalName()
-            console.log(
-                'avatar changed!'
-            )
-        } else {
-
-            await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`, {
-                avatar,
-                name: this.state.userName,
-                uid,
-                colors
-
-            })
-
-            this.closeModalName()
-            console.log(
-                'avatar changed!'
-            )
-        }
-    }
-
-    sendUsername = () => {
-        this.changeUserName()
-
-    }
-
-    addNewName = event => {
-        this.setState({
-            userName: event.target.value
-        })
     }
 
 
     render(){
 
-         const {user, modal, previewImage, croppedImage} = this.state
+         const {user, modal, previewImage, croppedImage, loading} = this.state
 
         const {primaryColor} = this.props
 
@@ -418,8 +388,14 @@ class UserPanel extends Component{
                     >
                         <Dropdown trigger={
                             <span>
-                                <Image src={user.photoURL} spaced='right' avatar />
-                                {user.displayName}
+
+
+                                { loading ? <Segment style={{
+                                    background: primaryColor
+                                }}>
+                                    <Loader  active />
+                                </Segment> : <Image src={user && user.photoURL} spaced='right' avatar/>}
+                                {user && user.displayName}
                             </span>
                         } options={this.dropdownOptions()}>
 
@@ -533,10 +509,11 @@ class UserPanel extends Component{
 
 const mapStateToProps = state => {
     return {
-        user: state.user.currentUser
+        user: state.user.currentUser,
+        currentChannel: state.channel.currentChannel
     }
 }
 
 
-export default connect(mapStateToProps, {setUser, setAvatar})(UserPanel)
+export default connect(mapStateToProps, {setUser, setAvatar, setUserPostsAvatar, setCurrentChannel})(UserPanel)
 

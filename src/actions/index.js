@@ -6,7 +6,8 @@ import {
     SET_CURRENT_CHANNEL, SET_KEY,
     SET_PRIVATE_CHANNEL, SET_STAR_CHANNEL,
     SET_USER,
-    SET_USER_POSTS, SET_USERS_COLORS
+    SET_USER_POSTS, SET_USERS_COLORS,
+    SET_USER_POSTS_AVATAR
 } from "./types";
 
 //Users actions
@@ -120,3 +121,13 @@ export const setAvatar = (avatarURL) => {
         }
     }
 }
+
+export const setUserPostsAvatar = userPostAvatar => {
+    return {
+        type: SET_USER_POSTS_AVATAR,
+        payload: {
+            userPostAvatar
+        }
+    }
+}
+

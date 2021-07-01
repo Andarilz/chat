@@ -4,7 +4,7 @@ import {
     SET_CURRENT_CHANNEL,
     SET_PRIVATE_CHANNEL,
     SET_USER_POSTS,
-    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR, SET_USERS_COLORS, SET_AVATAR
+    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR, SET_USERS_COLORS, SET_AVATAR, SET_USER_POSTS_AVATAR
 } from "../actions/types";
 
 const initialUserState = {
@@ -38,7 +38,12 @@ const user_reducer = (state = initialUserState, {payload, type}) => {
 const initialChannelState = {
     currentChannel: null,
     isPrivateChannel: false,
-    userPosts: null,
+    userPosts: {
+        avatar: '',
+        count: 0,
+        name: '',
+        uid: ''
+    },
     starChannel: null
 }
 
@@ -54,6 +59,11 @@ export const channel_reducers  = (state = initialChannelState, {type, payload}) 
         case SET_USER_POSTS:
 
             return {...state, userPosts: payload.userPosts}
+
+        case SET_USER_POSTS_AVATAR:
+
+            return {...state, userPosts: {...state.userPosts, avatar: payload.userPostAvatar}}
+
 
         case SET_STAR_CHANNEL:
             return {...state, starChannel: payload.channel}
