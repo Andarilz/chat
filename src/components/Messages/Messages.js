@@ -7,7 +7,9 @@ import axios from 'axios'
 import Message from "./Message";
 import {connect} from "react-redux";
 import {setKey, setStarChannel, setUserPosts, setCancelChannelStar} from "../../actions";
-import $ from 'jquery'
+import Skeleton from "./Skeleton";
+import '../App.css'
+
 
 
 
@@ -390,10 +392,26 @@ class Messages extends Component{
         return channel && `${this.state.PrivateChannel ? '@' : '#'}${channel.name}` //выводим имя канала
     }
 
+
+    displayMessagesSkeleton = loading => {
+        return (
+            loading ? (
+                <React.Fragment>
+                    {[...Array(10)].map((_, i) => (
+                        <Skeleton
+                            key={i}
+                        />
+                    ))}
+                </React.Fragment>
+            ) : null
+        )
+    }
+
+
     render(){
 
         const {messagesRef, channel, user, messages, progressBar, numUniqueUsers, searchTerm,
-            searchResults, searchLoading, PrivateChannel, isChannelStarred, idOfStarredChannel} = this.state
+            searchResults, searchLoading, PrivateChannel, isChannelStarred, idOfStarredChannel, messagesLoading} = this.state
 
         return(
             <React.Fragment>
@@ -412,6 +430,7 @@ class Messages extends Component{
 
                 <Segment>
                     <Comment.Group className={progressBar ? 'messages__progress' : 'messages' }>
+                        {this.displayMessagesSkeleton(messagesLoading)}
                         { searchTerm ? this.displayMessages(searchResults) : this.displayMessages(messages) }
                         <div ref={node => this.messagesEnd = node} />
                     </Comment.Group>
