@@ -30,7 +30,7 @@ class Root extends React.Component {
             if(user){ //был вход
                 this.props.setUser(user)
                 setTimeout(() => {
-                    this.props.history.push('/') //редирект при регистрации
+                    // this.props.history.push('/') //редирект при регистрации
                 },1000)
             }
 

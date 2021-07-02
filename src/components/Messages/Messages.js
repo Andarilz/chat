@@ -50,6 +50,15 @@ class Messages extends Component{
         }
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) { //следим за изменениями
+        if(this.messagesEnd){ //прикручиваем ref в рендере
+            this.scrollToBottom()
+        }
+    }
+
+    scrollToBottom = () => { //прокручиваем после получния сообщения
+        this.messagesEnd.scrollIntoView({behavior: 'smooth'})
+    }
 
 
     firstListeners = async () => { //делаем запрос к бд для получения данных
@@ -404,6 +413,7 @@ class Messages extends Component{
                 <Segment>
                     <Comment.Group className={progressBar ? 'messages__progress' : 'messages' }>
                         { searchTerm ? this.displayMessages(searchResults) : this.displayMessages(messages) }
+                        <div ref={node => this.messagesEnd = node} />
                     </Comment.Group>
                 </Segment>
 

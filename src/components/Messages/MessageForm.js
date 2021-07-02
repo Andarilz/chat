@@ -198,13 +198,13 @@ class MessageForm extends Component{
 
     }
 
-    handleTogglePicker = (event) => {
+    handleTogglePicker = (event) => { //переключение эмодзи
         this.setState({
             emojiPicker: !this.state.emojiPicker
         })
     }
 
-    handleSelectEmoji = emoji => {
+    handleSelectEmoji = emoji => { //отображение смайлов
         const oldMessage = this.state.message
         const newMessage = this.colonToUnicode(` ${oldMessage} ${emoji.colons} `)
 
@@ -218,7 +218,7 @@ class MessageForm extends Component{
         }, 0)
     }
 
-    colonToUnicode = message => {
+    colonToUnicode = message => { //регулярка для смайлов
         return message.replace(/:[A-Za-z0-9_+-]+:/g, x => {
             x = x.replace(/:/g, "");
             let emoji = emojiIndex.emojis[x];
@@ -259,7 +259,7 @@ class MessageForm extends Component{
                     onKeyDown={this.enterClick}
                     fluid
                     name='message'
-                    ref={node => this.messageInputRef = node}
+                    ref={node => this.messageInputRef = node} //ставим фокус на инпут после выбора смайлов
                     style={{
                         marginBottom: '0.7em'
                     }}
