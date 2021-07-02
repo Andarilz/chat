@@ -79,3 +79,7 @@ body,
     border: 1px solid black
 }
 
+.emoji_picker{
+    position: absolute;
+
+}
