@@ -29,9 +29,7 @@ class Root extends React.Component {
          firebase.auth().onAuthStateChanged(user => { //проверка входа
             if(user){ //был вход
                 this.props.setUser(user)
-                setTimeout(() => {
-                    // this.props.history.push('/') //редирект при регистрации
-                },1000)
+                    this.props.history.push('/') //редирект при регистрации
             }
 
             else {

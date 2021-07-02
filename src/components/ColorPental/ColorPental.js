@@ -26,8 +26,6 @@ class ColorPenal extends Component{
     }
 
 
-
-
     addListeners = async userId => {
         let usersColors = []
 
@@ -199,7 +197,7 @@ class ColorPenal extends Component{
     }
 
     displayUserColors = colors => {
-        if(colors.length){
+        if(colors.length > 0){
            return colors.map((color, i )=> {
                return (
                    <React.Fragment key={i}>

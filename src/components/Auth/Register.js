@@ -70,7 +70,6 @@ export default class Register extends Component{
     }
 
     saveUser = async createdUser => {
-        console.log('reg1')
         //работает
          await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users.json`, {
              name: createdUser.user.displayName,
