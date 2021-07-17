@@ -4,8 +4,11 @@ import {Link} from 'react-router-dom'
 import firebase from '../../Firebase/Firebase'
 import md5 from 'md5'
 import axios from 'axios'
+import {connect} from "react-redux";
+import {setLoading} from "../../actions";
 
-export default class Register extends Component{
+
+class Register extends Component{
 
     state = {
         username: '',
@@ -80,6 +83,10 @@ export default class Register extends Component{
                  secondary: "#4c3c4c"
              }
         })
+             .then(() => {
+                 this.props.setLoading(true)
+                 console.log('inf')
+             })
 
     }
 
@@ -215,7 +222,14 @@ export default class Register extends Component{
     }
 }
 
+const mapStateToProps = state => {
+    return {
+        reg: state.reg.loading
+    }
+}
 
+
+export default connect(mapStateToProps, {setLoading})(Register)
 
 
 

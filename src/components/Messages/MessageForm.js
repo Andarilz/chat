@@ -77,19 +77,16 @@ class MessageForm extends Component{
                 name: this.props.user.displayName,
                 avatar: this.props.user.photoURL,
                 errors: []
-
             },
         }
 
-        if(linkImage !== null){ //создаем поле image со ссылкой, если она есть
+        if(linkImage===String){ //создаем поле image со ссылкой, если она есть
             message['image'] = linkImage
-
         }
-
-        else if(fileURL !== null){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
+        if(fileURL){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
             message['image'] = fileURL
         }
-        else if(!linkImage && !fileURL) {
+        if(linkImage!==String && !fileURL) {
             message['content'] = this.state.message // создаем поле content для отображения текста
         }
 
@@ -100,13 +97,11 @@ class MessageForm extends Component{
 
         const {message, channel, link, user} = this.state
 
-
         if(message.trim().length || link){ // проверяем на пробелы и на пустоту
             //send message
 
             this.setState({loading: true})
             this.props.updateData() //обновляем список сообщений после отсылки сообщения
-
 
             const creatingURL = this.props.isPrivateChannel
                 ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
@@ -116,6 +111,7 @@ class MessageForm extends Component{
                 await axios.post(creatingURL, this.createMessage(null, linkImage))
 
                 .then(() => { //записываем в БД ссылку, вытащенную из Storage
+                    console.log(3)
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
                     this.props.counterUp()

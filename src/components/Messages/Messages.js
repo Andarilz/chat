@@ -312,8 +312,6 @@ class Messages extends Component{
                         messages: mess,
                         messagesLoading: false,
                     })
-
-
                     this.countUniqUsers(mess)
                     this.countUserPosts(mess)
                     console.log(mess)

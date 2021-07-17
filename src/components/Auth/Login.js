@@ -2,8 +2,10 @@ import React, {Component} from 'react'
 import {Grid, Form, Segment, Button, Header, Message, Icon} from 'semantic-ui-react'
 import {Link} from 'react-router-dom'
 import firebase from '../../Firebase/Firebase'
+import {connect} from "react-redux";
+import {setLoading} from "../../actions";
 
-export default class Login extends Component{
+class Login extends Component{
 
     state = {
         email: '',
@@ -36,6 +38,7 @@ export default class Login extends Component{
                 .signInWithEmailAndPassword(this.state.email, this.state.password)
                 .then(signInUser => {
                     console.log(signInUser)
+                    this.props.setLoading(true)
                 })
                 .catch(e => {
                     console.log(e)
@@ -121,7 +124,7 @@ export default class Login extends Component{
 }
 
 
-
+export default connect(null, {setLoading})(Login)
 
 
 

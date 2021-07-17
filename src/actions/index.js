@@ -7,7 +7,8 @@ import {
     SET_PRIVATE_CHANNEL, SET_STAR_CHANNEL,
     SET_USER,
     SET_USER_POSTS, SET_USERS_COLORS,
-    SET_USER_POSTS_AVATAR
+    SET_USER_POSTS_AVATAR,
+    SET_LOADING_REG
 } from "./types";
 
 //Users actions
@@ -131,3 +132,11 @@ export const setUserPostsAvatar = userPostAvatar => {
     }
 }
 
+export const setLoading = (value) => {
+    return {
+        type: SET_LOADING_REG,
+        payload: {
+            value
+        }
+    }
+}

@@ -4,7 +4,14 @@ import {
     SET_CURRENT_CHANNEL,
     SET_PRIVATE_CHANNEL,
     SET_USER_POSTS,
-    SET_COLORS, SET_KEY, SET_STAR_CHANNEL, SET_CANCEL_CHANNEL_STAR, SET_USERS_COLORS, SET_AVATAR, SET_USER_POSTS_AVATAR
+    SET_COLORS,
+    SET_KEY,
+    SET_STAR_CHANNEL,
+    SET_CANCEL_CHANNEL_STAR,
+    SET_USERS_COLORS,
+    SET_AVATAR,
+    SET_USER_POSTS_AVATAR,
+    SET_LOADING_REG
 } from "../actions/types";
 
 const initialUserState = {
@@ -126,6 +133,19 @@ export const avatar = (state = '', {payload, type}) => {
     }
 }
 
+export const reg = (state = false, {payload, type}) => {
+    switch(type){
+
+        case SET_LOADING_REG:
+
+            return {
+                loading: payload.value
+            }
+
+        default: return state
+    }
+}
+
 
 
 
@@ -134,7 +154,8 @@ const rootReducer = combineReducers({
     channel: channel_reducers,
     colors: colors_reducers,
     key: userKey,
-    avatar
+    avatar,
+    reg
 })
 
 

@@ -11,7 +11,7 @@ import {createStore} from "redux";
 import {Provider, connect} from "react-redux";
 import {composeWithDevTools} from 'redux-devtools-extension';
 import rootReducer from './reducers';
-import {clearUser, setUser} from "./actions";
+import {clearUser, setLoading, setUser} from "./actions";
 import Spinner from "./components/Spinner";
 import axios from "axios";
 
@@ -25,16 +25,19 @@ class Root extends React.Component {
     }
 
     componentDidMount() {
-
          firebase.auth().onAuthStateChanged(user => { //проверка входа
+
             if(user){ //был вход
                 this.props.setUser(user)
+                setTimeout(() => {
                     this.props.history.push('/') //редирект при регистрации
+                },2000)
             }
 
             else {
                 this.props.history.push('/login') //редирект без регистрации
                 this.props.clearUser()
+                this.props.setLoading(false)
             }
         })
     }
@@ -54,14 +57,15 @@ const mapStateToProps = state => {
     return {
         isLoading: state.user.isLoading,
         currentUser: state.user.currentUser,
-        avatar: state.avatar.avatar
+        avatar: state.avatar.avatar,
+        reg: state.reg.loading
     }
 }
 
 const RootWithRouter = withRouter(
     connect(
         mapStateToProps,
-        {setUser, clearUser} //передаем пользователя в редакс
+        {setUser, clearUser, setLoading} //передаем пользователя в редакс
         )(Root)
 )
 

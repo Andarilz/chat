@@ -22,7 +22,7 @@ class ColorPenal extends Component{
 
         this.Listeners()//получаем ключ
             .then(() => this.addListeners(this.state.usersCorrectKey))//передаем ключ и получаем данные
-            .then(() => this.props.setColors(this.props.usersColors[0].primary, this.props.usersColors[0].secondary))
+            .then(() => this.props.setColors(this.props.usersColors ? this.props.usersColors[0].primary : 'black', this.props.usersColors ? this.props.usersColors[0].secondary : 'white'))
     }
 
 
@@ -203,8 +203,8 @@ class ColorPenal extends Component{
                    <React.Fragment key={i}>
                        <Divider />
                        <div className="color__container" onClick={() => this.props.setColors(color.primary, color.secondary)}>
-                           <div className="color__square" style={{background: color.primary || 'black'}}>
-                               <div className="color__overlay" style={{background: color.secondary || 'white'}}></div>
+                           <div className="color__square" style={{background: color ? color.primary : 'black'}}>
+                               <div className="color__overlay" style={{background: color ? color.secondary : 'white'}} />
                            </div>
                        </div>
                    </React.Fragment>
