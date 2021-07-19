@@ -1,14 +1,12 @@
-import React, {Component} from 'react'
+import React from 'react'
 import { Header, Segment, Input, Icon } from 'semantic-ui-react'
 import {connect} from "react-redux";
 
 
-class MessagesHeader extends Component{
-
-    render(){
+const MessagesHeader = props => {
 
         const {channelName, numUniqueUsers, handleSearchChange, searchLoading, isPrivateChannel,
-            handleStar, isChannelStarred} = this.props
+            handleStar, isChannelStarred} = props
 
 
         return(
@@ -54,7 +52,6 @@ class MessagesHeader extends Component{
 
             </Segment>
         )
-    }
 }
 
 const mapStateToProps = state => {

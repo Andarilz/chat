@@ -5,11 +5,8 @@ import Channels from "./Channels";
 import DirectMessages from "./DirectMessages";
 import Starred from "./Starred";
 
-class SidePanel extends Component{
-    render(){
-
-        const {currentUser, primaryColor} = this.props
-
+const SidePanel = props => {
+        const {currentUser, primaryColor} = props
 
         return(
             <Menu
@@ -28,7 +25,6 @@ class SidePanel extends Component{
                 <DirectMessages currentUser={currentUser} />
             </Menu>
         )
-    }
 }
 
 export default SidePanel

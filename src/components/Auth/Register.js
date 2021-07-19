@@ -79,7 +79,7 @@ class Register extends Component{
              avatar: createdUser.user.photoURL,
              uid: createdUser.user.uid,
              colors: {
-                 primary: '#eee',
+                 primary: 'green',
                  secondary: "#4c3c4c"
              }
         })

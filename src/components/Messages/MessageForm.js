@@ -52,27 +52,14 @@ class MessageForm extends Component{
         if(event.keyCode === 13 && this.state.message){
             this.sendMessage()
         }
-
-        // if(message){
-        //
-        //     await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/typing/${channel.id}.json`, {
-        //          [user.uid]: user.displayName
-        //     })
-        //
-        // } else {
-        //     await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/typing/${channel.id}.json`,{})
-        // }
     }
 
     createMessage = (fileURL = null, linkImage= null) => { //формируем объект для отправки на сервер
+
+        console.log('mess', typeof linkImage === 'string')
         const message = {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             user: {
-                // id: this.state.user.uid,
-                // name: this.state.user.displayName,
-                // avatar: this.state.user.photoURL,
-                // errors: []
-
                 id: this.props.user.uid,
                 name: this.props.user.displayName,
                 avatar: this.props.user.photoURL,
@@ -80,15 +67,19 @@ class MessageForm extends Component{
             },
         }
 
-        if(linkImage===String){ //создаем поле image со ссылкой, если она есть
+        if(typeof linkImage === 'string'){ //создаем поле image со ссылкой, если она есть
             message['image'] = linkImage
+            console.log(333)
         }
-        if(fileURL){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
+        else if(typeof fileURL === 'string'){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
             message['image'] = fileURL
+            console.log(fileURL, 'url')
         }
-        if(linkImage!==String && !fileURL) {
+        else {
             message['content'] = this.state.message // создаем поле content для отображения текста
         }
+
+        console.log(fileURL, 'что отсылаем')
 
         return message
     }
@@ -96,6 +87,8 @@ class MessageForm extends Component{
     sendMessage = async (linkImage = null) => { //отсылаем текстовое сообщение
 
         const {message, channel, link, user} = this.state
+
+        console.log('link from mess', linkImage)
 
         if(message.trim().length || link){ // проверяем на пробелы и на пустоту
             //send message
@@ -107,6 +100,7 @@ class MessageForm extends Component{
                 ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
                 : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`
 
+            console.log(linkImage, 'before post')
 
                 await axios.post(creatingURL, this.createMessage(null, linkImage))
 
@@ -174,6 +168,7 @@ class MessageForm extends Component{
 
     LinkImage = async linkURL => {
         await this.sendMessage(linkURL) //передаем ссылку в sendMessage
+        console.log(typeof linkURL === 'string','url')
     }
 
     linkFinished = bool => { //меняем статус ссылки, чтобы нас пропустил в sendMessage проверяльщик на пробелы и на пустоту

@@ -378,7 +378,7 @@ class UserPanel extends Component{
 
                         <Header inverted floated='left' as='h2'>
                             <Icon name='code' />
-                            <Header.Content>DevChat</Header.Content>
+                            <Header.Content>IsaChat</Header.Content>
                         </Header>
 
                     </Grid.Row>
