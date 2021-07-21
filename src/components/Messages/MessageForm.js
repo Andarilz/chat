@@ -56,7 +56,7 @@ class MessageForm extends Component{
 
     createMessage = (fileURL = null, linkImage= null) => { //формируем объект для отправки на сервер
 
-        console.log('mess', typeof linkImage === 'string')
+        console.log('попали в криэйт')
 
         const message = {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
@@ -67,6 +67,9 @@ class MessageForm extends Component{
                 errors: []
             },
         }
+
+        console.log(message, 'что отсылаем')
+
 
         if(typeof linkImage === 'string' && linkImage.trim().length){ //создаем поле image со ссылкой, если она есть
             message['image'] = linkImage
@@ -93,8 +96,6 @@ class MessageForm extends Component{
         if(message.trim().length || typeof linkImage === 'string'){ // проверяем на пробелы и на пустоту
             //send message
 
-            console.log('перед БД',linkImage)
-
             this.setState({loading: true})
             this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
@@ -102,9 +103,7 @@ class MessageForm extends Component{
                 ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
                 : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`
 
-
                 await axios.post(creatingURL, this.createMessage(null, linkImage))
-
                 .then(() => { //записываем в БД ссылку, вытащенную из Storage
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
@@ -179,17 +178,21 @@ class MessageForm extends Component{
 
     sendFileMessage = async (fileURl, pathToUpload) => { //формируем объект для отправки картинки в БД
 
+        const {channel} = this.state
+
         this.setState({loading: true})
 
         this.props.updateData() //обновляем список сообщений после отсылки сообщения
 
-        await axios.post(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${pathToUpload}.json`, this.createMessage(fileURl))
+        const creatingURL = this.props.isPrivateChannel
+            ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
+            : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`
+
+        await axios.post(creatingURL, this.createMessage(fileURl))
             .then(() => { //отсылаем картинку в БД
-                console.log(5)
                 this.setState({loading: false, errors: [], message: '', rerenderComp: false, uploadState: 'done'})//чистим стейт
                 this.props.updateData()//активируем коллбэк в компоненте Messages для будущего get-запроса к БД и обновления списка сообщений
                 this.props.counterUp()
-                console.log(this.props.counter, 'counter')
             })
             .catch(e => {
                 console.error(e)
