@@ -57,6 +57,7 @@ class MessageForm extends Component{
     createMessage = (fileURL = null, linkImage= null) => { //формируем объект для отправки на сервер
 
         console.log('mess', typeof linkImage === 'string')
+
         const message = {
             timestamp: firebase.database.ServerValue.TIMESTAMP,
             user: {
@@ -67,19 +68,20 @@ class MessageForm extends Component{
             },
         }
 
-        if(typeof linkImage === 'string'){ //создаем поле image со ссылкой, если она есть
+        if(typeof linkImage === 'string' && linkImage.trim().length){ //создаем поле image со ссылкой, если она есть
             message['image'] = linkImage
-            console.log(333)
+            console.log(linkImage)
         }
-        else if(typeof fileURL === 'string'){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
+        else if(typeof fileURL === 'string' && fileURL.trim().length){ //либо создаем поле image со ссылкой на файл, загруженный на БД Firebase
             message['image'] = fileURL
             console.log(fileURL, 'url')
         }
-        else {
+        else if(this.state.message.trim().length) {
+            console.log(this.state.message, 'данные')
             message['content'] = this.state.message // создаем поле content для отображения текста
         }
 
-        console.log(fileURL, 'что отсылаем')
+        console.log(message, 'что отсылаем')
 
         return message
     }
@@ -88,10 +90,10 @@ class MessageForm extends Component{
 
         const {message, channel, link, user} = this.state
 
-        console.log('link from mess', linkImage)
-
-        if(message.trim().length || link){ // проверяем на пробелы и на пустоту
+        if(message.trim().length || typeof linkImage === 'string'){ // проверяем на пробелы и на пустоту
             //send message
+
+            console.log('перед БД',linkImage)
 
             this.setState({loading: true})
             this.props.updateData() //обновляем список сообщений после отсылки сообщения
@@ -100,12 +102,10 @@ class MessageForm extends Component{
                 ? `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/private/${channel.id}.json`
                 : `https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channel.id}.json`
 
-            console.log(linkImage, 'before post')
 
                 await axios.post(creatingURL, this.createMessage(null, linkImage))
 
                 .then(() => { //записываем в БД ссылку, вытащенную из Storage
-                    console.log(3)
                     this.setState({loading: false, errors: [], message: '', rerenderComp: false}) //чистим стейт
                     this.props.updateData() //активируем колл-бэк, чтобы он в компоненте Messages сделал запрос на сервер снова и обновил список сообщений, хот-релоад
                     this.props.counterUp()
