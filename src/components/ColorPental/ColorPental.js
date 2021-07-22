@@ -39,6 +39,7 @@ class ColorPenal extends Component{
                     usersColors
                 })
                 this.props.setUsersColors(usersColors)
+                this.props.setColors(usersColors[0].primary, usersColors[0].secondary)
             })
     }
 
@@ -155,7 +156,6 @@ class ColorPenal extends Component{
 
             }).then(() => {
                 this.addListeners(this.state.usersCorrectKey)
-                console.log(1)
             })
 
             this.closeModal()
@@ -189,6 +189,7 @@ class ColorPenal extends Component{
     handleSaveColors = () => {
         if(this.state.primary && this.state.secondary){
             this.saveColors(this.state.primary, this.state.secondary)
+            // this.props.setColors(this.state.primary, this.state.secondary)
         }
     }
 
@@ -202,7 +203,10 @@ class ColorPenal extends Component{
                return (
                    <React.Fragment key={i}>
                        <Divider />
-                       <div className="color__container" onClick={() => this.props.setColors(color.primary, color.secondary)}>
+                       <div className="color__container" onClick={() => {
+                           this.props.setColors(color.primary, color.secondary)
+                           console.log(222)
+                       }}>
                            <div className="color__square" style={{background: color ? color.primary : 'black'}}>
                                <div className="color__overlay" style={{background: color ? color.secondary : 'white'}} />
                            </div>
@@ -229,13 +233,14 @@ class ColorPenal extends Component{
             >
                 <Divider  />
                 <Button
-                icon='add'
-                size='small'
-                color='blue'
+                icon='paint brush'
+                size='medium'
+                color='white'
+                inverted
                 onClick={this.openModal}
                 />
 
-                {this.displayUserColors(usersColors)}
+                {/*{this.displayUserColors(usersColors)}*/}
 
                 {/*Color Picker Modal*/}
 
