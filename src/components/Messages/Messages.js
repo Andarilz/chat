@@ -46,10 +46,21 @@ class Messages extends Component{
                 .then(() => {
                     this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
                     this.addUserStarListener(channel.id, this.props.keyInf) //обрабатываем звезду
-                    // this.addUsersListeners() //получаем данные пользователей
                 })
 
         }
+
+        setInterval(() => {
+            if (channel && user) {
+                this.firstListeners()
+                    .then(() => {
+                        this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
+                        this.addUserStarListener(channel.id, this.props.keyInf) //обрабатываем звезду
+                        // this.addUsersListeners() //получаем данные пользователей
+                    })
+
+            }
+        },1000)
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) { //следим за изменениями
@@ -198,8 +209,6 @@ class Messages extends Component{
 
         const {avatar, name, uid, colors} = this.state
 
-        console.log(111111)
-
         await axios.put(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/users/${key}.json`,{
             avatar,
             name,
@@ -314,7 +323,6 @@ class Messages extends Component{
                     })
                     this.countUniqUsers(mess)
                     this.countUserPosts(mess)
-                    console.log(mess)
                 }else{
                     this.setState({
                         messages: '',

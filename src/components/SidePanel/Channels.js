@@ -25,6 +25,10 @@ class Channels extends Component{
 
     componentDidMount() {
         this.addListeners() //при первой загрузке обновляем значения из БД
+
+        setInterval(() => {
+            this.addListeners() //при первой загрузке обновляем значения из БД
+        },1000)
     }
 
     addListeners = async () => { //запрашиваем данные по каналам из БД
@@ -46,77 +50,6 @@ class Channels extends Component{
 
             })
     }
-
-    //notification
-
-    //по отсылке сообщения
-
-    //
-    // addNotificationListener = async channelId => {
-    //
-    //     console.log(2)
-    //
-    //     await axios.get(`https://chat-14c5a-default-rtdb.europe-west1.firebasedatabase.app/messages/${channelId}.json`)
-    //
-    //         .then(res => {
-    //
-    //             console.log(3)
-    //             const results = res.data || []
-    //
-    //             const keysOfMessages = Object.keys(results) //получаем ключи объектов с сообщениями
-    //             const snap = keysOfMessages.map(res => results[res]) //перебираем данные для удобства, формируя массив да
-    //
-    //                 // console.log('axios note')
-    //
-    //             if(this.state.channel){
-    //                 this.handleNotifications(channelId, this.state.channel.id, this.state.notifications, snap)
-    //                 // console.log('axios inner note')
-    //             }
-    //         })
-    //
-    // }
-    //
-    // handleNotifications = (channelId, currentChannelId, notifications, snap) => {
-    //
-    //     // console.log(channelId)
-    //
-    //     // console.log(1)
-    //
-    //     let lastTotal = 0;
-    //
-    //     let index = notifications.findIndex(notification => notification.id === channelId)
-    //
-    //     if(index !== -1){
-    //
-    //         if(channelId !== currentChannelId){
-    //             lastTotal = notifications[index].total
-    //
-    //             if(((snap.length) - lastTotal) > 0){
-    //                 notifications[index].count = (snap.length) - lastTotal
-    //             }
-    //         }
-    //
-    //         notifications[index].lastKnownTotal = snap.length
-    //
-    //     } else {
-    //         notifications.push({
-    //             id: channelId,
-    //             total: snap.length,
-    //             lastKnownTotal: snap.length,
-    //             count: 0
-    //         })
-    //     }
-    //
-    //     this.setState({
-    //         notifications
-    //     })
-    //
-    //     console.log(this.state.notifications)
-    //
-    // }
-
-    //notification
-
 
     setFirstChannel = () => { //автопрокрутка на первый канал
 
