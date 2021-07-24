@@ -75,23 +75,23 @@ class MetaPenal extends Component{
                     </Accordion.Content>
 
 
-                    <Accordion.Title
-                        active={activeIndex === 1}
-                        index={1}
-                        onClick={this.setActiveIndex}
-                    >
-                        <Icon name='dropdown'/>
-                        <Icon name='user circle'/>
+                    {/*<Accordion.Title*/}
+                    {/*    active={activeIndex === 1}*/}
+                    {/*    index={1}*/}
+                    {/*    onClick={this.setActiveIndex}*/}
+                    {/*>*/}
+                    {/*    <Icon name='dropdown'/>*/}
+                    {/*    <Icon name='user circle'/>*/}
 
-                        Top Posters
+                    {/*    Top Posters*/}
 
-                    </Accordion.Title>
-                    <Accordion.Content active={activeIndex === 1}>
-                        <List>
-                            {userPosts && this.displayTopPosters(userPosts)}
+                    {/*</Accordion.Title>*/}
+                    {/*<Accordion.Content active={activeIndex === 1}>*/}
+                    {/*    <List>*/}
+                    {/*        {userPosts && this.displayTopPosters(userPosts)}*/}
 
-                        </List>
-                    </Accordion.Content>
+                    {/*    </List>*/}
+                    {/*</Accordion.Content>*/}
 
 
                     <Accordion.Title
