@@ -12,7 +12,6 @@ import '../App.css'
 
 
 
-
 class Messages extends Component{
 
     state = {
@@ -34,7 +33,9 @@ class Messages extends Component{
         userCorrectData: '',
         avatar: '',
         name: '',
-        uid: ''}
+        uid: '',
+        toggle: false
+    }
 
 
 
@@ -62,17 +63,6 @@ class Messages extends Component{
             }
         },1000)
     }
-
-    componentDidUpdate(prevProps, prevState, snapshot) { //следим за изменениями
-        if(this.messagesEnd){ //прикручиваем ref в рендере
-            this.scrollToBottom()
-        }
-    }
-
-    scrollToBottom = () => { //прокручиваем после получния сообщения
-        this.messagesEnd.scrollIntoView({behavior: 'smooth', block: "end", inline: "end"})
-    }
-
 
     firstListeners = async () => { //делаем запрос к бд для получения данных
 
@@ -438,7 +428,7 @@ class Messages extends Component{
                     <Comment.Group className={progressBar ? 'messages__progress' : 'messages' }>
                         {this.displayMessagesSkeleton(messagesLoading)}
                         { searchTerm ? this.displayMessages(searchResults) : this.displayMessages(messages) }
-                        <div ref={node => this.messagesEnd = node} />
+                        <div id='id2' ref={node => this.messagesEnd = node} />
                     </Comment.Group>
                 </Segment>
 

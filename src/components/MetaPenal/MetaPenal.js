@@ -74,26 +74,6 @@ class MetaPenal extends Component{
                         {channel && channel.details}
                     </Accordion.Content>
 
-
-                    {/*<Accordion.Title*/}
-                    {/*    active={activeIndex === 1}*/}
-                    {/*    index={1}*/}
-                    {/*    onClick={this.setActiveIndex}*/}
-                    {/*>*/}
-                    {/*    <Icon name='dropdown'/>*/}
-                    {/*    <Icon name='user circle'/>*/}
-
-                    {/*    Top Posters*/}
-
-                    {/*</Accordion.Title>*/}
-                    {/*<Accordion.Content active={activeIndex === 1}>*/}
-                    {/*    <List>*/}
-                    {/*        {userPosts && this.displayTopPosters(userPosts)}*/}
-
-                    {/*    </List>*/}
-                    {/*</Accordion.Content>*/}
-
-
                     <Accordion.Title
                         active={activeIndex === 2}
                         index={2}
@@ -108,7 +88,6 @@ class MetaPenal extends Component{
                     <Accordion.Content active={activeIndex === 2}>
 
                         <Header>
-                            {/*<Image circular src={channel.createdBy.avatar} />*/}
                             {channel && channel.createdBy.name}
                         </Header>
 

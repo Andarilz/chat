@@ -240,10 +240,6 @@ class ColorPenal extends Component{
                 onClick={this.openModal}
                 />
 
-                {/*{this.displayUserColors(usersColors)}*/}
-
-                {/*Color Picker Modal*/}
-
                 <Modal basic open={modal} onClose={this.closeModal}>
                     <Modal.Header>Choose App Colors</Modal.Header>
                     <Modal.Content>
