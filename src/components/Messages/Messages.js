@@ -51,17 +51,16 @@ class Messages extends Component{
 
         }
 
-        setInterval(() => {
-            if (channel && user) {
-                this.firstListeners()
-                    .then(() => {
-                        this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
-                        this.addUserStarListener(channel.id, this.props.keyInf) //обрабатываем звезду
-                        // this.addUsersListeners() //получаем данные пользователей
-                    })
-
-            }
-        },1000)
+        // setInterval(() => {
+        //     if (channel && user) {
+        //         this.firstListeners()
+        //             // .then(() => {
+        //             //     this.addListeners(channel.id) //подтягиваем данные из БД при первом заходе
+        //             //     this.addUserStarListener(channel.id, this.props.keyInf) //обрабатываем звезду
+        //             //     // this.addUsersListeners() //получаем данные пользователей
+        //             // })
+        //     }
+        // },3000)
     }
 
     firstListeners = async () => { //делаем запрос к бд для получения данных
