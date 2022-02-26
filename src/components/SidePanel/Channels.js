@@ -26,9 +26,9 @@ class Channels extends Component{
     componentDidMount() {
         this.addListeners() //при первой загрузке обновляем значения из БД
 
-        setInterval(() => {
-            this.addListeners() //при первой загрузке обновляем значения из БД
-        },1000)
+        // setInterval(() => {
+        //     this.addListeners() //при первой загрузке обновляем значения из БД
+        // },1000)
     }
 
     addListeners = async () => { //запрашиваем данные по каналам из БД
